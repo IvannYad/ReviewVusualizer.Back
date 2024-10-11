@@ -56,13 +56,15 @@ namespace ReviewVisualizer.Generator.Generator
             }
         }
 
-        public void CreateReviewer(Reviewer reviewer)
+        public bool CreateReviewer(Reviewer reviewer)
         {
-            if (!_isInitialized) return;
-            if (_reviewersCollection.ContainsKey(reviewer)) return;
+            if (!_isInitialized) return false;
+            if (_reviewersCollection.ContainsKey(reviewer)) return false;
 
-            _logger.LogInformation($"Reviewer {reviewer.Name} is created in stopped state");
             reviewer.IsStopped = true;
+            _reviewersCollection.Add(reviewer, null);
+            _logger.LogInformation($"Reviewer {reviewer.Name} is created in stopped state");
+            return true;
         }
 
         public bool StopReviewer(int id)

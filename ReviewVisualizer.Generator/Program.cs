@@ -40,7 +40,7 @@ builder.Services.AddCors(opt =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+}, ServiceLifetime.Singleton);
 
 builder.Services.AddSingleton<IGeneratorHost, GeneratorHost>();
 builder.Services.AddAutoMapper(typeof(MyMapper));

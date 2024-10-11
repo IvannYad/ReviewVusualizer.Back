@@ -58,15 +58,21 @@ namespace ReviewVisualizer.Data.Models
                 review.Communication = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
                 review.Overall = (review.TeachingQuality + review.StudentsSupport + review.Communication) / 3;
 
-                var randomTeacher = Teachers.ElementAt(r.Next(Teachers.Count()));
+                var randomTeacher = Teachers.Count() > 1 ? Teachers.ElementAt(r.Next(Teachers.Count())) : null;
 
-                review.Teacher = randomTeacher;
+                if (randomTeacher is null)
+                {
+                    IsStopped = true;
+                    break;
+                }
+                
+                
                 review.TeacherId = randomTeacher.Id;
 
                 if (IsStopped) break;
                 dbContext.Reviews.Add(review);
                 dbContext.SaveChanges();
-                logger.LogInformation($"Review for teacher {randomTeacher.FirstName + " " + randomTeacher.LastName} is added. Reviewer - {Name}");
+                logger.LogInformation($"Review for teacher {randomTeacher.FirstName + " " + randomTeacher.LastName} is added [ Reviewer: {Name} ]");
 
                 Thread.Sleep(TimeSpan.FromMilliseconds(ReviewGenerationFrequensyMiliseconds));
             }

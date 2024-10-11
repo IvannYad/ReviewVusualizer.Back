@@ -5,7 +5,6 @@ using ReviewVisualizer.Data.Models;
 using ReviewVisualizer.Data.Dto;
 using System.Drawing;
 using ReviewVisualizer.Generator.Generator;
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.EntityFrameworkCore;
 
 namespace ReviewVisualizer.Generator.Controllers
@@ -14,12 +13,14 @@ namespace ReviewVisualizer.Generator.Controllers
     [Route("reviewers")]
     public class ReviewerController : ControllerBase
     {
+        private readonly ILogger<ReviewerController> _logger;
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IGeneratorHost _generatorHost;
         
-        public ReviewerController(ApplicationDbContext dbContext, IMapper mapper, [FromServices]IGeneratorHost generatorHost)
+        public ReviewerController(ILogger<ReviewerController> logger, ApplicationDbContext dbContext, IMapper mapper, [FromServices]IGeneratorHost generatorHost)
         {
+            _logger = logger;
             _dbContext = dbContext;
             _mapper = mapper;
             _generatorHost = generatorHost;
@@ -42,14 +43,17 @@ namespace ReviewVisualizer.Generator.Controllers
             var reviewer = _mapper.Map<Reviewer>(reviewerDTO);
             reviewer.Teachers = new List<Teacher>();
 
-            // Create new reviewer in database.
-            _dbContext.Reviewers.Add(reviewer);
-            _dbContext.SaveChanges();
-
             // Create new reviewer in generator.
-            _generatorHost.CreateReviewer(reviewer);
+            bool success = _generatorHost.CreateReviewer(reviewer);
 
-            return Ok();
+            if (success)
+            {
+                // Create new reviewer in database.
+                _dbContext.Reviewers.Add(reviewer);
+                _dbContext.SaveChanges();
+            }
+            
+            return Ok(success);
         }
 
         [HttpPost("stop-reviewer/{id:int}")]
@@ -103,6 +107,7 @@ namespace ReviewVisualizer.Generator.Controllers
             chosenTeachers.ForEach(t => reviewer.Teachers.Add(t));
             _dbContext.SaveChanges();
 
+            _logger.LogInformation($"Teachers [{string.Join(", ", chosenTeachers.Select(t => $"{t.FirstName} {t.LastName}"))}] are added to reviewer {reviewer.Name}");
             return Ok(chosenTeachers);
         }
 
@@ -112,10 +117,12 @@ namespace ReviewVisualizer.Generator.Controllers
             var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
+            var deletedTeachers = reviewer.Teachers.Where(t => teacherIds.Contains(t.Id)).ToList();
             reviewer.Teachers = reviewer.Teachers.Where(t => !teacherIds.Contains(t.Id)).ToList();
 
             _dbContext.SaveChanges();
 
+            _logger.LogInformation($"Teachers [{string.Join(", ", deletedTeachers.Select(t => $"{t.FirstName} {t.LastName}"))}] are deleted from reviewer {reviewer.Name}");
             return Ok(teacherIds);
         }
     }
