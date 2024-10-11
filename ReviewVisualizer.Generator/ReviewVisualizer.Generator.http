@@ -1,0 +1,6 @@
+@ReviewVisualizer.Generator_HostAddress = http://localhost:5115
+
+GET {{ReviewVisualizer.Generator_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

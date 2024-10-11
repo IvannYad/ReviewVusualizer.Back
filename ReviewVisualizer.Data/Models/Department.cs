@@ -1,0 +1,20 @@
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace ReviewVisualizer.Data.Models
+{
+    public class Department
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public string LogoUrl { get; set; }
+
+        [DefaultValue(0)]
+        public double Rating { get; set; }
+    }
+}
