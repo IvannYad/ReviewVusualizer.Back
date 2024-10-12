@@ -41,12 +41,12 @@ namespace ReviewVisualizer.Generator.Generator
         {
             if (!_isInitialized) return;
 
-            _logger.LogInformation($"Generator Host started");
+            _logger.LogInformation($"[GeneratorHost] Generator Host started");
             foreach (var t in _reviewersCollection)
             {
                 if (!_reviewers.FirstOrDefault(r => r.Id == t.Key.Id)?.IsStopped ?? false && t.Value is not null)
                 {
-                    _logger.LogInformation($"Reviewer {t.Key.Name} is started");
+                    _logger.LogInformation($"[GeneratorHost] Reviewer {t.Key.Name} is started");
                     t.Value?.Start();
                 }
                 else
@@ -63,7 +63,7 @@ namespace ReviewVisualizer.Generator.Generator
 
             reviewer.IsStopped = true;
             _reviewersCollection.Add(reviewer, null);
-            _logger.LogInformation($"Reviewer {reviewer.Name} is created in stopped state");
+            _logger.LogInformation($"[GeneratorHost] Reviewer {reviewer.Name} is created in stopped state");
             return true;
         }
 
@@ -74,7 +74,7 @@ namespace ReviewVisualizer.Generator.Generator
             var reviewer = _reviewersCollection.Keys.FirstOrDefault(r => r.Id == id);
             if (reviewer is null) return false;
 
-            _logger.LogInformation($"Stopping reviewer {reviewer.Name}");
+            _logger.LogInformation($"[GeneratorHost] Stopping reviewer {reviewer.Name}");
 
             reviewer.IsStopped = true;
             return true;
@@ -87,7 +87,7 @@ namespace ReviewVisualizer.Generator.Generator
             var reviewer = _reviewersCollection.Keys.FirstOrDefault(r => r.Id == id);
             if (reviewer is null || reviewer.IsStopped == false || reviewer.Teachers?.Count() == 0) return false;
 
-            _logger.LogInformation($"Starting reviewer {reviewer.Name}");
+            _logger.LogInformation($"[GeneratorHost] Starting reviewer {reviewer.Name}");
 
             reviewer.IsStopped = false;
             _reviewersCollection[reviewer] ??= new Thread(() => reviewer.GenerateReview(ApplicationDbContext.CreateNew(_dbContext), _reviewerLogger));
@@ -102,7 +102,7 @@ namespace ReviewVisualizer.Generator.Generator
             Reviewer? reviewer = sender as Reviewer;
             if (reviewer is null) return;
 
-            _logger.LogInformation($"Reviewer {reviewer.Name} is stopped");
+            _logger.LogInformation($"[GeneratorHost] Reviewer {reviewer.Name} is stopped");
 
             _reviewersCollection[reviewer] = null;
         }

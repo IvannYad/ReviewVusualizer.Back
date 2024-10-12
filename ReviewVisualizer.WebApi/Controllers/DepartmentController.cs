@@ -19,7 +19,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         public DepartmentController(IConfiguration configuration, ApplicationDbContext dbContext, IMapper mapper)
         {
             _imagesStoragePath = configuration.GetValue<string>("ImagesStorage");
-            _dbContext = dbContext;
+            _dbContext = ApplicationDbContext.CreateNew(dbContext);
             _mapper = mapper;
         }
 

@@ -5,6 +5,7 @@ using ReviewVisualizer.Data.Models;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Mapper;
 using System.Drawing;
+using Microsoft.EntityFrameworkCore;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -19,7 +20,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         public TeacherController(IConfiguration configuration, ApplicationDbContext dbContext, IMapper mapper)
         {
             _imagesStoragePath = configuration.GetValue<string>("ImagesStorage");
-            _dbContext = dbContext;
+            _dbContext = ApplicationDbContext.CreateNew(dbContext);
             _mapper = mapper;
         }
 
@@ -98,6 +99,51 @@ namespace ReviewVisualizer.WebApi.Controllers
             {
                 return BadRequest(e);
             }
+        }
+
+        [HttpGet("get-department-rank/{teacherId:int}")]
+        public  IActionResult GetRankInDepartment(int teacherId)
+        {
+            var teacher = _dbContext.Teachers.FirstOrDefault(t => t.Id == teacherId);
+            if (teacher is null)
+            {
+                return NotFound();
+            }
+            
+            int rank = (int)_dbContext.Database.SqlQuery<long>(
+                @$"
+                    SELECT TOP 1 tr.rank as Value
+                    FROM (
+                        SELECT t.Id, ROW_NUMBER() OVER(ORDER BY t.Rating DESC) as rank
+                        FROM Teachers t
+	                    WHERE t.DepartmentId = {teacher.DepartmentId}
+                    ) tr
+                    WHERE tr.Id = {teacher.Id}
+                ").First();
+
+            return Ok(rank);
+        }
+
+        [HttpGet("get-global-rank/{teacherId:int}")]
+        public IActionResult GetGlobalRank(int teacherId)
+        {
+            var teacher = _dbContext.Teachers.FirstOrDefault(t => t.Id == teacherId);
+            if (teacher is null)
+            {
+                return NotFound();
+            }
+
+            int rank = (int)_dbContext.Database.SqlQuery<long>(
+                @$"
+                    SELECT TOP 1 tr.rank as Value
+                    FROM (
+                        SELECT t.Id, ROW_NUMBER() OVER(ORDER BY t.Rating DESC) as rank
+                        FROM Teachers t
+                    ) tr
+                    WHERE tr.Id = {teacherId}
+                ").First();
+
+            return Ok(rank);
         }
     }
 }
