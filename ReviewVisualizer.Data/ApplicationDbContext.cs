@@ -11,10 +11,14 @@ namespace ReviewVisualizer.Data
 {
     public class ApplicationDbContext :DbContext
     {
+        private static readonly object _createNewLock = new object();
         public static ApplicationDbContext CreateNew(ApplicationDbContext original)
         {
-            var options = original.GetService<DbContextOptions<ApplicationDbContext>>();
-            return new ApplicationDbContext(options);
+            lock (_createNewLock)
+            {
+                var options = original.GetService<DbContextOptions<ApplicationDbContext>>();
+                return new ApplicationDbContext(options);
+            }
         }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)

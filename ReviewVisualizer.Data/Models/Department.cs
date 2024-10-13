@@ -15,6 +15,6 @@ namespace ReviewVisualizer.Data.Models
         public string LogoUrl { get; set; }
 
         [DefaultValue(0)]
-        public double Rating { get; set; }
+        public double? Rating { get; set; }
     }
 }

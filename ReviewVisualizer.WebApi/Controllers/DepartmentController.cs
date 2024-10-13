@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Dto;
+using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
 using System.Drawing;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -87,6 +90,30 @@ namespace ReviewVisualizer.WebApi.Controllers
             {
                 return BadRequest(e);
             }
+        }
+
+        [HttpGet("get-grade/{departmentId:int}")]
+        public IActionResult GetGrade(int departmentId, [FromQuery] GradeCategory category)
+        {
+            var department = _dbContext.Departments.FirstOrDefault(d => d.Id == departmentId);
+            if (department is null)
+            {
+                return NotFound();
+            }
+
+            string columnName = Enum.GetName(typeof(GradeCategory), category) ?? "Overall";
+            string query = 
+                @$"
+                    SELECT AVG(CAST(r.{columnName} AS FLOAT)) as Value
+                    FROM Departments d
+                    LEFT JOIN Teachers t ON t.DepartmentId = d.Id
+                    LEFT JOIN Reviews r ON r.TeacherId = t.Id
+                    WHERE d.Id = {department.Id}
+                ";
+            double? grade = _dbContext.Database.SqlQuery<double?>(FormattableStringFactory.Create(query)).FirstOrDefault();
+
+            grade = grade is not null ? (double)Math.Round((decimal)grade, 2) : null; ;
+            return Ok(grade);
         }
     }
 }

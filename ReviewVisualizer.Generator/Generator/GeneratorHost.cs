@@ -62,6 +62,7 @@ namespace ReviewVisualizer.Generator.Generator
             if (_reviewersCollection.ContainsKey(reviewer)) return false;
 
             reviewer.IsStopped = true;
+            reviewer.ThreadCompleted += OnWorkerStopped;
             _reviewersCollection.Add(reviewer, null);
             _logger.LogInformation($"[GeneratorHost] Reviewer {reviewer.Name} is created in stopped state");
             return true;
@@ -75,7 +76,6 @@ namespace ReviewVisualizer.Generator.Generator
             if (reviewer is null) return false;
 
             _logger.LogInformation($"[GeneratorHost] Stopping reviewer {reviewer.Name}");
-
             reviewer.IsStopped = true;
             return true;
         }

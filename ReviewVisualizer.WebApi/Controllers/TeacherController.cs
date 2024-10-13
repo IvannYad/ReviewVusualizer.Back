@@ -6,6 +6,8 @@ using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Mapper;
 using System.Drawing;
 using Microsoft.EntityFrameworkCore;
+using ReviewVisualizer.Data.Enums;
+using System.Runtime.CompilerServices;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -144,6 +146,29 @@ namespace ReviewVisualizer.WebApi.Controllers
                 ").First();
 
             return Ok(rank);
+        }
+
+        [HttpGet("get-grade/{teacherId:int}")]
+        public IActionResult GetGrade(int teacherId, [FromQuery] GradeCategory category)
+        {
+            var teacher = _dbContext.Teachers.FirstOrDefault(t => t.Id == teacherId);
+            if (teacher is null)
+            {
+                return NotFound();
+            }
+
+            string columnName = Enum.GetName(typeof(GradeCategory), category) ?? "Overall";
+            string query = @$"
+                    SELECT AVG(CAST(r.{columnName} AS FLOAT)) as Value
+                    FROM Teachers t
+                    LEFT JOIN Reviews r ON r.TeacherId = t.Id
+                    WHERE t.Id = {teacherId}
+                ";
+
+            double? grade = _dbContext.Database.SqlQuery<double?>(FormattableStringFactory.Create(query)).FirstOrDefault();
+
+            grade = grade is not null ? (double)Math.Round((decimal)grade, 2) : null;
+            return Ok(grade);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace ReviewVisualizer.Data.Models
         public string PhotoUrl { get; set; }
 
         [DefaultValue(0)]
-        public double Rating { get; set; }
+        public double? Rating { get; set; }
 
         [ForeignKey(nameof(Department))]
         public int DepartmentId { get; set; }

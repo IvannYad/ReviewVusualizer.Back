@@ -10,6 +10,6 @@ namespace ReviewVisualizer.Data.Dto
 
         [Required]
         public string LogoUrl { get; set; }
-        public double Rating { get; set; } = 0;
+        public double? Rating { get; set; }
     }
 }
