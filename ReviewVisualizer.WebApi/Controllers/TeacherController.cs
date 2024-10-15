@@ -18,6 +18,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly string _imagesStoragePath;
+        private static object _lock = new object();
 
         public TeacherController(IConfiguration configuration, ApplicationDbContext dbContext, IMapper mapper)
         {
@@ -59,8 +60,33 @@ namespace ReviewVisualizer.WebApi.Controllers
         [HttpPost()]
         public IActionResult Create([FromBody] TeacherCreateDTO dept)
         {
-            _dbContext.Teachers.Add(_mapper.Map<Teacher>(dept));
-            _dbContext.SaveChanges();
+            lock (_lock)
+            {
+                _dbContext.Teachers.Add(_mapper.Map<Teacher>(dept));
+                _dbContext.SaveChanges();
+                return Ok();
+            }
+        }
+
+        [HttpDelete()]
+        public IActionResult Delete([FromQuery] int teacherId)
+        {
+            Teacher? teacher = _dbContext.Teachers.FirstOrDefault(t => t.Id == teacherId);
+            if (teacher is null)
+            {
+                return NotFound();
+            }
+            
+            lock (_lock)
+            {
+                Review[] reviews = _dbContext.Reviews.Where(r => r.TeacherId == teacher.Id).ToArray();
+                _dbContext.Reviews.RemoveRange(reviews);
+
+                DeleteImage(teacher.PhotoUrl);
+                _dbContext.Teachers.Remove(teacher);
+                _dbContext.SaveChanges();
+            }
+            
             return Ok();
         }
 
@@ -108,19 +134,21 @@ namespace ReviewVisualizer.WebApi.Controllers
             {
                 return NotFound();
             }
-            
-            int rank = (int)_dbContext.Database.SqlQuery<long>(
-                @$"
-                    SELECT TOP 1 tr.rank as Value
-                    FROM (
-                        SELECT t.Id, ROW_NUMBER() OVER(ORDER BY t.Rating DESC) as rank
-                        FROM Teachers t
-	                    WHERE t.DepartmentId = {teacher.DepartmentId}
-                    ) tr
-                    WHERE tr.Id = {teacher.Id}
-                ").First();
 
-            return Ok(rank);
+            lock (_lock)
+            {
+                int rank = (int)_dbContext.Database.SqlQuery<long>(
+                    @$"
+                        SELECT TOP 1 tr.rank as Value
+                        FROM (
+                            SELECT t.Id, ROW_NUMBER() OVER(ORDER BY t.Rating DESC) as rank
+                            FROM Teachers t
+	                        WHERE t.DepartmentId = {teacher.DepartmentId}
+                        ) tr
+                        WHERE tr.Id = {teacher.Id}
+                    ").First();
+                return Ok(rank);
+            }
         }
 
         [HttpGet("get-global-rank/{teacherId:int}")]
@@ -132,17 +160,20 @@ namespace ReviewVisualizer.WebApi.Controllers
                 return NotFound();
             }
 
-            int rank = (int)_dbContext.Database.SqlQuery<long>(
-                @$"
-                    SELECT TOP 1 tr.rank as Value
-                    FROM (
-                        SELECT t.Id, ROW_NUMBER() OVER(ORDER BY t.Rating DESC) as rank
-                        FROM Teachers t
-                    ) tr
-                    WHERE tr.Id = {teacherId}
-                ").First();
+            lock (_lock)
+            {
+                int rank = (int)_dbContext.Database.SqlQuery<long>(
+                    @$"
+                        SELECT TOP 1 tr.rank as Value
+                        FROM (
+                            SELECT t.Id, ROW_NUMBER() OVER(ORDER BY t.Rating DESC) as rank
+                            FROM Teachers t
+                        ) tr
+                        WHERE tr.Id = {teacherId}
+                    ").First();
 
-            return Ok(rank);
+                return Ok(rank);
+            }
         }
 
         [HttpGet("get-grade/{teacherId:int}")]
@@ -162,10 +193,13 @@ namespace ReviewVisualizer.WebApi.Controllers
                     WHERE t.Id = {teacherId}
                 ";
 
-            double? grade = _dbContext.Database.SqlQuery<double?>(FormattableStringFactory.Create(query)).FirstOrDefault();
+            lock (_lock)
+            {
+                double? grade = _dbContext.Database.SqlQuery<double?>(FormattableStringFactory.Create(query)).FirstOrDefault();
 
-            grade = grade is not null ? (double)Math.Round((decimal)grade, 2) : null;
-            return Ok(grade);
+                grade = grade is not null ? (double)Math.Round((decimal)grade, 2) : null;
+                return Ok(grade);
+            }
         }
     }
 }

@@ -41,7 +41,13 @@ namespace ReviewVisualizer.Data.Models
                 var review = queue.GetReview();
                 if (review is not null)
                 {
+                    if (!dbContext.Teachers.Any(t => t.Id == review.TeacherId))
+                        continue;
+
                     Thread.Sleep(ProcessingDurationMiliseconds);
+                    if (!dbContext.Teachers.Any(t => t.Id == review.TeacherId))
+                        continue;
+
                     dbContext.Reviews.Add(review);
                     dbContext.SaveChanges();
                     logger.LogInformation($"[Reviewer] Review is processed [ Analyst: {Name} ]");

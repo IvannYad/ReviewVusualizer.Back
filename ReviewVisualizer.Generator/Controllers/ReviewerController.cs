@@ -29,7 +29,7 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpGet()]
         public IActionResult GetAll()
         {
-            var reviewers = _dbContext.Reviewers.Include(r => r.Teachers).ToList();
+            var reviewers = _dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
 
             return Ok(reviewers);
         }
