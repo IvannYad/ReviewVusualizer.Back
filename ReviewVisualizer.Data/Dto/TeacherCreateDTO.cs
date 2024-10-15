@@ -20,6 +20,7 @@ namespace ReviewVisualizer.Data.Dto
         [Required]
         public string PhotoUrl { get; set; }
 
+        [Range(1.0, 100.0)]
         public double? Rating { get; set; }
 
         [Required]

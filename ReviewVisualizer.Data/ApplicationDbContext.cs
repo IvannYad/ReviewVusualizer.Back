@@ -30,6 +30,7 @@ namespace ReviewVisualizer.Data
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Reviewer> Reviewers { get; set; }
+        public DbSet<Analyst> Analysts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

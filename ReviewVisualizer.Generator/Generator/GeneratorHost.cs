@@ -11,15 +11,20 @@ namespace ReviewVisualizer.Generator.Generator
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<GeneratorHost> _logger;
         private readonly ILogger<Reviewer> _reviewerLogger;
+        private readonly IQueueController _queue;
         private readonly List<Reviewer> _reviewers;
         private readonly Dictionary<Reviewer, Thread?> _reviewersCollection;
         private bool _isInitialized = false;
 
-        public GeneratorHost([FromServices]ApplicationDbContext dbContext, [FromServices]ILogger<GeneratorHost> logger, [FromServices]ILogger<Reviewer> reviewerLogger)
+        public GeneratorHost([FromServices]ApplicationDbContext dbContext,
+            [FromServices]ILogger<GeneratorHost> logger,
+            [FromServices]ILogger<Reviewer> reviewerLogger,
+            [FromServices]IQueueController queue)
         {
             _dbContext = dbContext;
             _logger = logger;
             _reviewerLogger = reviewerLogger;
+            _queue = queue;
             _reviewers = _dbContext.Reviewers.Include(r => r.Teachers).ToList();
             _reviewersCollection = new Dictionary<Reviewer, Thread?>();
         }
@@ -28,7 +33,7 @@ namespace ReviewVisualizer.Generator.Generator
         {
             if (_isInitialized) return;
             
-            _reviewers.ForEach(r => _reviewersCollection.Add(r, new Thread(() => r.GenerateReview(ApplicationDbContext.CreateNew(_dbContext), _reviewerLogger))));
+            _reviewers.ForEach(r => _reviewersCollection.Add(r, new Thread(() => r.GenerateReview(_queue, _reviewerLogger))));
             foreach(var rev in _reviewersCollection.Keys)
             {
                 rev.ThreadCompleted += OnWorkerStopped;
@@ -90,7 +95,7 @@ namespace ReviewVisualizer.Generator.Generator
             _logger.LogInformation($"[GeneratorHost] Starting reviewer {reviewer.Name}");
 
             reviewer.IsStopped = false;
-            _reviewersCollection[reviewer] ??= new Thread(() => reviewer.GenerateReview(ApplicationDbContext.CreateNew(_dbContext), _reviewerLogger));
+            _reviewersCollection[reviewer] ??= new Thread(() => reviewer.GenerateReview(_queue, _reviewerLogger));
             _reviewersCollection[reviewer]?.Start();
             return true;
         }

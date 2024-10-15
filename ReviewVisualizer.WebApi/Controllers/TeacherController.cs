@@ -31,9 +31,6 @@ namespace ReviewVisualizer.WebApi.Controllers
         {
             var teachers = _dbContext.Teachers.ToList();
 
-            if (teachers is null)
-                return NotFound();
-
             return Ok(teachers);
         }
 

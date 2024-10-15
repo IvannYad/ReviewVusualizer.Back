@@ -1,4 +1,5 @@
-﻿using ReviewVisualizer.WebApi.RatingCalculationEngine;
+﻿using ReviewVisualizer.WebApi.Processor;
+using ReviewVisualizer.WebApi.RatingCalculationEngine;
 using System.Net.NetworkInformation;
 using System.Runtime.CompilerServices;
 
@@ -11,6 +12,14 @@ namespace ReviewVisualizer.WebApi
             var ratingCalculationEngine = app.Services.GetService<IRatingCalculatingEngine>();
 
             ratingCalculationEngine?.Start();
+        }
+
+        public static void StartProcessorHost(this WebApplication app)
+        {
+            var processotHost = app.Services.GetService<IProcessorHost>();
+
+            processotHost?.Init();
+            processotHost?.Start();
         }
     }
 }

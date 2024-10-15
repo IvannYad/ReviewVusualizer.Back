@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReviewVisualizer.Data;
 
@@ -11,9 +12,11 @@ using ReviewVisualizer.Data;
 namespace ReviewVisualizer.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241015090843_AddAnalyst")]
+    partial class AddAnalyst
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,7 +45,7 @@ namespace ReviewVisualizer.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Analysts", (string)null);
+                    b.ToTable("Analysts");
                 });
 
             modelBuilder.Entity("ReviewVisualizer.Data.Models.Department", b =>
@@ -66,7 +69,7 @@ namespace ReviewVisualizer.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Departments", (string)null);
+                    b.ToTable("Departments");
                 });
 
             modelBuilder.Entity("ReviewVisualizer.Data.Models.Review", b =>
@@ -99,7 +102,7 @@ namespace ReviewVisualizer.Data.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("ReviewVisualizer.Data.Models.Reviewer", b =>
@@ -140,7 +143,7 @@ namespace ReviewVisualizer.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Reviewers", (string)null);
+                    b.ToTable("Reviewers");
                 });
 
             modelBuilder.Entity("ReviewVisualizer.Data.Models.Teacher", b =>
@@ -179,7 +182,7 @@ namespace ReviewVisualizer.Data.Migrations
 
                     b.HasIndex("DepartmentId");
 
-                    b.ToTable("Teachers", (string)null);
+                    b.ToTable("Teachers");
                 });
 
             modelBuilder.Entity("ReviewerTeacher", b =>
@@ -194,7 +197,7 @@ namespace ReviewVisualizer.Data.Migrations
 
                     b.HasIndex("TeachersId");
 
-                    b.ToTable("ReviewerTeacher", (string)null);
+                    b.ToTable("ReviewerTeacher");
                 });
 
             modelBuilder.Entity("ReviewVisualizer.Data.Models.Review", b =>

@@ -6,6 +6,7 @@ using ReviewVisualizer.WebApi;
 using System.Text.Json.Serialization;
 using Serilog;
 using Serilog.Events;
+using ReviewVisualizer.WebApi.Processor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,9 +40,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 }, ServiceLifetime.Singleton);
-
+builder.Services.AddSingleton<IQueueController, QueueController>();
 builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>();
-
+builder.Services.AddSingleton<IProcessorHost, ProcessorHost>();
 builder.Services.AddAutoMapper(typeof(MyMapper));
 
 var app = builder.Build();
@@ -58,5 +59,6 @@ app.UseCors();
 app.UseAuthorization();
 
 app.MapControllers();
+app.StartProcessorHost();
 app.StartRatingCalculationEngine();
 app.Run();

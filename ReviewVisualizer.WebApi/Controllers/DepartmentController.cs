@@ -31,9 +31,6 @@ namespace ReviewVisualizer.WebApi.Controllers
         {
             var departments = _dbContext.Departments.ToList();
 
-            if (departments is null)
-                return NotFound();
-
             return Ok(departments);
         }
 

@@ -9,15 +9,19 @@ namespace ReviewVisualizer.Data.Dto
         public DateTime ReviewTime { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int TeachingQuality { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int StudentsSupport { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int Communication { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public double Overall { get; set; }
 
         [ForeignKey("Teacher")]

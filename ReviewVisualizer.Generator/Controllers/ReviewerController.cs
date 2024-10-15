@@ -29,12 +29,9 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpGet()]
         public IActionResult GetAll()
         {
-            var teachers = _dbContext.Reviewers.Include(r => r.Teachers).ToList();
+            var reviewers = _dbContext.Reviewers.Include(r => r.Teachers).ToList();
 
-            if (teachers is null)
-                return NotFound();
-
-            return Ok(teachers);
+            return Ok(reviewers);
         }
 
         [HttpPost()]

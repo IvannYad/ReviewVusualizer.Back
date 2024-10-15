@@ -16,24 +16,31 @@ namespace ReviewVisualizer.Data.Models
         public string Name { get; set; }
 
         [Required]
+        [Range(100, 100_000)]
         public int ReviewGenerationFrequensyMiliseconds { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int TeachingQualityMinGrage { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int TeachingQualityMaxGrage { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int StudentsSupportMinGrage { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int StudentsSupportMaxGrage { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int CommunicationMinGrage { get; set; }
 
         [Required]
+        [Range(1.0, 100.0)]
         public int CommunicationMaxGrage { get; set; }
 
         public bool IsStopped { get; set; }
@@ -41,7 +48,7 @@ namespace ReviewVisualizer.Data.Models
         [ValidateNever]
         public virtual ICollection<Teacher> Teachers { get; set; }
 
-        public void GenerateReview(ApplicationDbContext dbContext, ILogger<Reviewer> logger)
+        public void GenerateReview(IQueueController queue, ILogger<Reviewer> logger)
         {
             if (Teachers is null || Teachers.Count() < 1)
             {
@@ -51,7 +58,7 @@ namespace ReviewVisualizer.Data.Models
             Random r = new Random();
             while (!IsStopped)
             {
-                var review = new Review();
+                var review = new ReviewCreateDTO();
                 review.ReviewTime = DateTime.Now;
                 review.TeachingQuality = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
                 review.StudentsSupport = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
@@ -70,8 +77,7 @@ namespace ReviewVisualizer.Data.Models
                 review.TeacherId = randomTeacher.Id;
 
                 if (IsStopped) break;
-                dbContext.Reviews.Add(review);
-                dbContext.SaveChanges();
+                queue.AddReview(review);
                 logger.LogInformation($"[Reviewer] Review for {randomTeacher.FirstName} {randomTeacher.LastName} is added [ Reviewer: {Name} ]");
 
                 Thread.Sleep(TimeSpan.FromMilliseconds(ReviewGenerationFrequensyMiliseconds));
