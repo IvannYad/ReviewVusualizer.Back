@@ -7,6 +7,7 @@ namespace ReviewVisualizer.Generator.Generator
         public void Init();
         void Start();
         public bool CreateReviewer(Reviewer reviewer);
+        public bool DeleteReviewer(Reviewer reviewer);
         public bool StopReviewer(int id);
         public bool StartReviewer(int id);
         public void OnWorkerStopped(object sender, EventArgs e);

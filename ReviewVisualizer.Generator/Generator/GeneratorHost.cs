@@ -73,6 +73,18 @@ namespace ReviewVisualizer.Generator.Generator
             return true;
         }
 
+        public bool DeleteReviewer(Reviewer reviewer)
+        {
+            if (!_isInitialized) return true;
+            if (!_reviewersCollection.ContainsKey(reviewer)) return true;
+
+            _reviewersCollection[reviewer]?.Abort();
+            _reviewersCollection.Remove(reviewer);
+            
+            _logger.LogInformation($"[GeneratorHost] Reviewer {reviewer.Name} is deleted");
+            return true;
+        }
+
         public bool StopReviewer(int id)
         {
             if (!_isInitialized) return false;

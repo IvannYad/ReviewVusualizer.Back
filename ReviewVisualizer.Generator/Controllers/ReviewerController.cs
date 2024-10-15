@@ -53,6 +53,27 @@ namespace ReviewVisualizer.Generator.Controllers
             return Ok(success);
         }
 
+        [HttpDelete()]
+        public IActionResult Delete([FromQuery] int reviewerId)
+        {
+            Reviewer? reviewer = _dbContext.Reviewers.FirstOrDefault(t => t.Id == reviewerId);
+            if (reviewer is null)
+            {
+                return Ok();
+            }
+
+            if (_generatorHost.DeleteReviewer(reviewer))
+            {
+                _dbContext.Reviewers.Remove(reviewer);
+                _dbContext.SaveChanges();
+                return Ok();
+            }
+            
+            return BadRequest($"Error occurred while deleting reviewer {reviewer.Name}");
+        }
+
+
+
         [HttpPost("stop-reviewer/{id:int}")]
         public IActionResult StopReviewer(int id)
         {
