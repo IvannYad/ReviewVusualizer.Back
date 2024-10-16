@@ -56,33 +56,42 @@ namespace ReviewVisualizer.Data.Models
             }
 
             Random r = new Random();
-            while (!IsStopped)
+            try
             {
-                var randomTeacher = Teachers.Count() > 0 ? Teachers.ElementAt(r.Next(Teachers.Count())) : null;
-
-                if (randomTeacher is null)
+                while (!IsStopped)
                 {
-                    IsStopped = true;
-                    break;
+                    var randomTeacher = Teachers.Count() > 0 ? Teachers.ElementAt(r.Next(Teachers.Count())) : null;
+
+                    if (randomTeacher is null)
+                    {
+                        IsStopped = true;
+                        break;
+                    }
+
+                    var review = new ReviewCreateDTO();
+                    review.ReviewTime = DateTime.Now;
+                    review.TeachingQuality = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
+                    review.StudentsSupport = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
+                    review.Communication = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
+                    review.Overall = (review.TeachingQuality + review.StudentsSupport + review.Communication) / 3;
+
+                    review.TeacherId = randomTeacher.Id;
+
+                    if (IsStopped) break;
+
+                    queue.AddReview(review);
+                    logger.LogInformation($"[Reviewer] Review for {randomTeacher.FirstName} {randomTeacher.LastName} is added [ Reviewer: {Name} ]");
+
+                    Thread.Sleep(TimeSpan.FromMilliseconds(ReviewGenerationFrequensyMiliseconds));
                 }
-
-                var review = new ReviewCreateDTO();
-                review.ReviewTime = DateTime.Now;
-                review.TeachingQuality = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
-                review.StudentsSupport = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
-                review.Communication = r.Next(TeachingQualityMinGrage, TeachingQualityMaxGrage);
-                review.Overall = (review.TeachingQuality + review.StudentsSupport + review.Communication) / 3;
-
-                review.TeacherId = randomTeacher.Id;
-
-                if (IsStopped) break;
-
-                queue.AddReview(review);
-                logger.LogInformation($"[Reviewer] Review for {randomTeacher.FirstName} {randomTeacher.LastName} is added [ Reviewer: {Name} ]");
-
-                Thread.Sleep(TimeSpan.FromMilliseconds(ReviewGenerationFrequensyMiliseconds));
             }
-
+            catch (ThreadInterruptedException)
+            {
+                if (!IsStopped) logger.LogInformation($"[Reviewer] Reviewer {Name} is interrupted");
+                IsStopped = true;
+                return;
+            }
+            
             ThreadCompleted.Invoke(this, EventArgs.Empty);
         }
 

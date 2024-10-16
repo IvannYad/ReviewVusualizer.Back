@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,28 +37,39 @@ namespace ReviewVisualizer.Data.Models
             IQueueController queue, 
             ILogger<Analyst> logger)
         {
-            while (!IsStopped)
+            try
             {
-                var review = queue.GetReview();
-                if (review is not null)
+                while (!IsStopped)
                 {
-                    if (!dbContext.Teachers.Any(t => t.Id == review.TeacherId))
-                        continue;
+                    var review = queue.GetReview();
+                    if (review is not null)
+                    {
+                        if (!dbContext.Teachers.Any(t => t.Id == review.TeacherId))
+                            continue;
 
-                    Thread.Sleep(ProcessingDurationMiliseconds);
-                    if (!dbContext.Teachers.Any(t => t.Id == review.TeacherId))
-                        continue;
+                        Thread.Sleep(ProcessingDurationMiliseconds);
+                        if (!dbContext.Teachers.Any(t => t.Id == review.TeacherId))
+                            continue;
 
-                    dbContext.Reviews.Add(review);
-                    dbContext.SaveChanges();
-                    logger.LogInformation($"[Reviewer] Review is processed [ Analyst: {Name} ]");
-                }
-                else
-                {
-                    logger.LogInformation($"[Reviewer] There is no review in queue. Having a rest for 5 sec. [ Analyst: {Name} ]");
-                    Thread.Sleep(5000);
+                        dbContext.Reviews.Add(review);
+                        dbContext.SaveChanges();
+                        logger.LogInformation($"[Reviewer] Review is processed [ Analyst: {Name} ]");
+                    }
+                    else
+                    {
+                        logger.LogInformation($"[Reviewer] There is no review in queue. Having a rest for 5 sec. [ Analyst: {Name} ]");
+                        Thread.Sleep(5000);
+                    }
                 }
             }
+            catch (ThreadInterruptedException)
+            {
+                if (!IsStopped) logger.LogInformation($"[Analyst] Analyst {Name} is interrupted");
+                IsStopped = true;
+                return;
+            }
+
+            ThreadCompleted.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -74,6 +74,27 @@ namespace ReviewVisualizer.WebApi.Processor
             return true;
         }
 
+        public bool DeleteAnalyst(Analyst analyst)
+        {
+            if (!_isInitialized) return true;
+            if (!_analystCollection.ContainsKey(analyst)) return true;
+
+            try
+            {
+                _analystCollection[analyst]?.Interrupt();
+                _analystCollection[analyst]?.Join();
+                _analystCollection[analyst] = null;
+                _analystCollection.Remove(analyst);
+                _logger.LogInformation($"[ProcessorHost] Analyst {analyst.Name} is deleted");
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public bool StopAnalyst(int id)
         {
             if (!_isInitialized) return false;

@@ -4,13 +4,13 @@ namespace ReviewVisualizer.Generator.Generator
 {
     public interface IGeneratorHost
     {
-        public void Init();
+        void Init();
         void Start();
-        public bool CreateReviewer(Reviewer reviewer);
-        public bool DeleteReviewer(Reviewer reviewer);
-        public bool StopReviewer(int id);
-        public bool StartReviewer(int id);
-        public void OnWorkerStopped(object sender, EventArgs e);
+        bool CreateReviewer(Reviewer reviewer);
+        bool DeleteReviewer(Reviewer reviewer);
+        bool StopReviewer(int id);
+        bool StartReviewer(int id);
+        void OnWorkerStopped(object sender, EventArgs e);
 
     }
 }

@@ -78,10 +78,19 @@ namespace ReviewVisualizer.Generator.Generator
             if (!_isInitialized) return true;
             if (!_reviewersCollection.ContainsKey(reviewer)) return true;
 
-            _reviewersCollection[reviewer]?.Abort();
-            _reviewersCollection.Remove(reviewer);
-            
-            _logger.LogInformation($"[GeneratorHost] Reviewer {reviewer.Name} is deleted");
+            try
+            {
+                _reviewersCollection[reviewer]?.Interrupt();
+                _reviewersCollection[reviewer]?.Join();
+                _reviewersCollection[reviewer] = null;
+                _reviewersCollection.Remove(reviewer);
+                _logger.LogInformation($"[GeneratorHost] Reviewer {reviewer.Name} is deleted");
+            }
+            catch
+            {
+                return false;
+            }
+
             return true;
         }
 

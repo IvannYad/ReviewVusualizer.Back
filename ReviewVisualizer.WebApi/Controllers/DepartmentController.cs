@@ -112,5 +112,19 @@ namespace ReviewVisualizer.WebApi.Controllers
             grade = grade is not null ? (double)Math.Round((decimal)grade, 2) : null; ;
             return Ok(grade);
         }
+
+        [HttpGet("get-top")]
+        public IActionResult GetTop10()
+        {
+            var departments = _dbContext.Departments
+                .OrderByDescending(d => d.Rating)
+                .Take(10)
+                .ToList();
+
+            if (departments is null)
+                return NotFound();
+
+            return Ok(departments);
+        }
     }
 }

@@ -207,6 +207,35 @@ namespace ReviewVisualizer.WebApi.Controllers
             }
         }
 
+        [HttpGet("get-top")]
+        public IActionResult GetTop10()
+        {
+            var teachers = _dbContext.Teachers
+                .OrderByDescending(t => t.Rating)
+                .Take(10)
+                .ToList();
+
+            if (teachers is null)
+                return NotFound();
+
+            return Ok(teachers);
+        }
+
+        [HttpGet("get-top-in-department/{deptId:int}")]
+        public IActionResult GetTop10InDepartment(int deptId)
+        {
+            var teachers = _dbContext.Teachers
+                .Where(t => t.DepartmentId == deptId)
+                .OrderByDescending(t => t.Rating)
+                .Take(10)
+                .ToList();
+
+            if (teachers is null)
+                return NotFound();
+
+            return Ok(teachers);
+        }
+
         #region == Helper methods ==
 
         private bool CheckIfTeacherIsUnderReview(Teacher teacher)
