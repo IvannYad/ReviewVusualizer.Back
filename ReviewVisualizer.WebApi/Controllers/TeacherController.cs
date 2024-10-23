@@ -236,6 +236,17 @@ namespace ReviewVisualizer.WebApi.Controllers
             return Ok(teachers);
         }
 
+        [HttpGet("get-best")]
+        public IActionResult GetBest()
+        {
+            var teacher = _dbContext.Teachers.AsEnumerable().MaxBy(t => t.Rating);
+
+            if (teacher is null)
+                return NotFound();
+
+            return Ok(teacher);
+        }
+
         #region == Helper methods ==
 
         private bool CheckIfTeacherIsUnderReview(Teacher teacher)

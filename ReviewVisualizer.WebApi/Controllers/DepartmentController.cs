@@ -126,5 +126,17 @@ namespace ReviewVisualizer.WebApi.Controllers
 
             return Ok(departments);
         }
+
+
+        [HttpGet("get-best")]
+        public IActionResult GetBest()
+        {
+            var department = _dbContext.Departments.AsEnumerable().MaxBy(d => d.Rating);
+
+            if (department is null)
+                return NotFound();
+
+            return Ok(department);
+        }
     }
 }
