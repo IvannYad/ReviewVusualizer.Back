@@ -79,11 +79,6 @@ namespace ReviewVisualizer.WebApi.Controllers
 
             lock (_lock)
             {
-                if (CheckIfTeacherIsUnderReview(teacher))
-                {
-                    return BadRequest("Cannot delete teacher. It is under active review");
-                }
-
                 Review[] reviews = _dbContext.Reviews.Where(r => r.TeacherId == teacher.Id).ToArray();
                 _dbContext.Reviews.RemoveRange(reviews);
 
@@ -246,15 +241,5 @@ namespace ReviewVisualizer.WebApi.Controllers
 
             return Ok(teacher);
         }
-
-        #region == Helper methods ==
-
-        private bool CheckIfTeacherIsUnderReview(Teacher teacher)
-        {
-            var reviewers = _dbContext.Reviewers.Where(r => r.Teachers.Any(t => t.Id == teacher.Id));
-
-            return reviewers?.Any(r => !r.IsStopped) ?? false;
-        }
-        #endregion
     }
 }

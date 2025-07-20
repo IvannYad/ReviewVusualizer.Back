@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Models;
 using ReviewVisualizer.Data.Dto;
-using System.Drawing;
 using ReviewVisualizer.Generator.Generator;
 using Microsoft.EntityFrameworkCore;
 
@@ -62,7 +61,7 @@ namespace ReviewVisualizer.Generator.Controllers
                 return Ok();
             }
 
-            if (_generatorHost.DeleteReviewer(reviewer))
+            if (_generatorHost.DeleteReviewer(reviewer.Id))
             {
                 _dbContext.Reviewers.Remove(reviewer);
                 _dbContext.SaveChanges();
@@ -72,44 +71,37 @@ namespace ReviewVisualizer.Generator.Controllers
             return BadRequest($"Error occurred while deleting reviewer {reviewer.Name}");
         }
 
-
-
-        [HttpPost("stop-reviewer/{id:int}")]
-        public IActionResult StopReviewer(int id)
+        [HttpPost("generate-fire-and-forget")]
+        public IActionResult GenerateFireAndForget([FromQuery]int reviewerId)
         {
-            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == id);
+            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
-            // Stop reviewer in generator.
-            var success = _generatorHost.StopReviewer(reviewer.Id);
+            _generatorHost.GenerateFireAndForget(reviewer.Id);
 
-            if (success)
-            {
-                // Update info in darabase.
-                reviewer.IsStopped = true;
-                _dbContext.SaveChanges();
-            }
-
-            return Ok(success);
+            return Ok();
         }
 
-        [HttpPost("start-reviewer/{id:int}")]
-        public IActionResult StartReviewer(int id)
+        [HttpPost("generate-delayed")]
+        public IActionResult GenerateDelayed([FromQuery] int reviewerId, [FromQuery] TimeSpan delay)
         {
-            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == id);
+            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
-            // Start reviewer in generator.
-            bool success = _generatorHost.StartReviewer(reviewer.Id);
+            _generatorHost.GenerateDelayed(reviewer.Id, delay);
+            
+            return Ok();
+        }
 
-            if (success)
-            {
-                // Update info in darabase.
-                reviewer.IsStopped = false;
-                _dbContext.SaveChanges();
-            }
+        [HttpPost("generate-recurring")]
+        public IActionResult GenerateRecurring([FromQuery] int reviewerId, [FromQuery] TimeSpan interval)
+        {
+            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
+            if (reviewer is null) return NotFound();
 
-            return Ok(success);
+            _generatorHost.GenerateRecurring(reviewer.Id, interval);
+
+            return Ok();
         }
 
         [HttpPost("add-teachers")]

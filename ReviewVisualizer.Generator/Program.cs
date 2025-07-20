@@ -63,5 +63,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.StartGenerator();
 app.Run();

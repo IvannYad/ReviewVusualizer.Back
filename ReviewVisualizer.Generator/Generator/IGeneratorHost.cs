@@ -4,13 +4,10 @@ namespace ReviewVisualizer.Generator.Generator
 {
     public interface IGeneratorHost
     {
-        void Init();
-        void Start();
+        void GenerateFireAndForget(int reviewerId);
+        void GenerateDelayed(int reviewerId, TimeSpan delay);
+        void GenerateRecurring(int reviewerId, TimeSpan interval);
+        bool DeleteReviewer(int reviewerId);
         bool CreateReviewer(Reviewer reviewer);
-        bool DeleteReviewer(Reviewer reviewer);
-        bool StopReviewer(int id);
-        bool StartReviewer(int id);
-        void OnWorkerStopped(object sender, EventArgs e);
-
     }
 }

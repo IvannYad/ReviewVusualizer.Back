@@ -37,6 +37,7 @@ namespace ReviewVisualizer.Data.Dto
         [Range(1.0, 100.0)]
         public int CommunicationMaxGrage { get; set; }
 
-        public bool IsStopped { get; set; } = true;
+        [Required]
+        public GeneratorType Type { get; set; } = GeneratorType.FIRE_AND_FORGET;
     }
 }
