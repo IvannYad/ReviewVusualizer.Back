@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ReviewVisualizer.Data.Models
 {
@@ -14,10 +18,6 @@ namespace ReviewVisualizer.Data.Models
 
         [Required]
         public string Name { get; set; }
-
-        [Required]
-        [Range(100, 100_000)]
-        public int ReviewGenerationFrequensyMiliseconds { get; set; }
 
         [Required]
         [Range(1.0, 100.0)]
@@ -49,8 +49,13 @@ namespace ReviewVisualizer.Data.Models
         [ValidateNever]
         public virtual ICollection<Teacher> Teachers { get; set; }
 
-        public void GenerateReview(ApplicationDbContext dbContext, ILogger<Reviewer> logger, IMapper mapper)
+        public void GenerateReview(IServiceProvider services, ApplicationDbContext dbContext)
         {
+            var logger = services?.GetService<ILogger<Reviewer>>();
+            var mapper = services?.GetService<IMapper>();
+            if (mapper is null || logger is null)
+                throw new ArgumentNullException();
+
             logger.LogInformation($"Starting adding review from reviewer: {Name}");
 
             if (Teachers is null || Teachers.Count() < 1)
@@ -74,8 +79,10 @@ namespace ReviewVisualizer.Data.Models
                 // Let's imitate some heavy work that takes some time.
                 Thread.Sleep(r.Next(500, 5000));
 
-                dbContext.Reviews.Add(mapper.Map<Review>(review));
+                var reviewEntity = mapper.Map<Review>(review);
+                dbContext.Reviews.Add(reviewEntity);
                 dbContext.SaveChanges();
+
                 logger.LogInformation($"[Reviewer] Review for {randomTeacher.FirstName} {randomTeacher.LastName} is added [ Reviewer: {Name} ]");
             }
             catch

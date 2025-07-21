@@ -16,13 +16,17 @@ namespace ReviewVisualizer.Generator.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IGeneratorHost _generatorHost;
-        
-        public ReviewerController(ILogger<ReviewerController> logger, ApplicationDbContext dbContext, IMapper mapper, [FromServices]IGeneratorHost generatorHost)
+        private readonly IServiceProvider _services;
+
+        public ReviewerController(ILogger<ReviewerController> logger,
+            ApplicationDbContext dbContext, IMapper mapper, [FromServices]IGeneratorHost generatorHost,
+            IServiceProvider services)
         {
             _logger = logger;
             _dbContext = dbContext;
             _mapper = mapper;
             _generatorHost = generatorHost;
+            _services = services;
         }
 
         [HttpGet()]
@@ -94,12 +98,12 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost("generate-recurring")]
-        public IActionResult GenerateRecurring([FromQuery] int reviewerId, [FromQuery] TimeSpan interval)
+        public IActionResult GenerateRecurring([FromQuery] int reviewerId, [FromQuery] string cron)
         {
             var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
-            _generatorHost.GenerateRecurring(reviewer.Id, interval);
+            _generatorHost.GenerateRecurring(reviewer.Id, cron);
 
             return Ok();
         }

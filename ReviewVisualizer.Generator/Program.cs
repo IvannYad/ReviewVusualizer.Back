@@ -4,10 +4,9 @@ using ReviewVisualizer.Data.Mapper;
 using ReviewVisualizer.Generator;
 using ReviewVisualizer.Generator.Generator;
 using Serilog;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System.Text.Json.Serialization;
 using Serilog.Events;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,20 +46,19 @@ builder.Services.AddSingleton<IQueueController, QueueController>();
 builder.Services.AddSingleton<IGeneratorHost, GeneratorHost>();
 builder.Services.AddAutoMapper(typeof(MyMapper));
 
+builder.Services.AddHangfireServices(builder.Configuration);
+
 var app = builder.Build();
-
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseHangfireDashboard(options: new DashboardOptions()
+{
+    DashboardTitle = "Reviews processing dashboard"
+});
+app.MapHangfireDashboard();
 
 app.Run();

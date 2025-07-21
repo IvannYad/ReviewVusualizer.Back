@@ -12,6 +12,7 @@ namespace ReviewVisualizer.Data.Mapper
             CreateMap<Teacher, TeacherCreateDTO>().ReverseMap();
             CreateMap<Reviewer, ReviewerCreateDTO>().ReverseMap();
             CreateMap<Analyst, AnalystCreateDTO>().ReverseMap();
+            CreateMap<Review, ReviewCreateDTO>().ReverseMap();
         }
     }
 }

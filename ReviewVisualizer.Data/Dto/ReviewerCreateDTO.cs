@@ -10,10 +10,6 @@ namespace ReviewVisualizer.Data.Dto
         public string Name { get; set; }
 
         [Required]
-        [Range(100, 100_000)]
-        public int ReviewGenerationFrequensyMiliseconds { get; set; }
-
-        [Required]
         [Range(1.0, 100.0)]
         public int TeachingQualityMinGrage { get; set; }
 

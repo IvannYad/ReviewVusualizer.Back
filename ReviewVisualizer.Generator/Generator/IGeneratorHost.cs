@@ -6,7 +6,7 @@ namespace ReviewVisualizer.Generator.Generator
     {
         void GenerateFireAndForget(int reviewerId);
         void GenerateDelayed(int reviewerId, TimeSpan delay);
-        void GenerateRecurring(int reviewerId, TimeSpan interval);
+        void GenerateRecurring(int reviewerId, string cron);
         bool DeleteReviewer(int reviewerId);
         bool CreateReviewer(Reviewer reviewer);
     }
