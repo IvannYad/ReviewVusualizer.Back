@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using ReviewVisualizer.AuthLibrary.Exceptions;
 using ReviewVisualizer.Data.Dto;
@@ -28,9 +30,30 @@ namespace ReviewVisualizer.WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            //var loginResponse = await _authService.
+            try
+            {
+                var principal = await _authService.LoginAsync(loginRequest);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                    });
 
-            return Ok(new LoginResponse(true));
+                return Ok(new LoginResponse(true));
+            }
+            catch (UserUnauthenticatedException ex)
+            {
+                return Unauthorized(new LoginResponse(false, ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    title: "An unexpected server error ocurred",
+                    detail: ex.Message
+                );
+            }
         }
 
         [HttpPost("register")]
@@ -46,7 +69,7 @@ namespace ReviewVisualizer.WebApi.Controllers
             {
                 var registerResponse = await _authService.RegisterAsync(registerRequest);
 
-                return Ok(registerResponse);
+                return Ok(new RegisterResponse(registerResponse));
             }
             catch (UserAlreadyExistsException ex)
             {

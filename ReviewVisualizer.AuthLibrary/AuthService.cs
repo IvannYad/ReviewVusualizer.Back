@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.AuthLibrary.Exceptions;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Models;
+using System.Security.Claims;
 
 namespace ReviewVisualizer.WebApi.Services
 {
@@ -19,7 +22,7 @@ namespace ReviewVisualizer.WebApi.Services
             _passwordService = passwordService;
         }
 
-        public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
+        public async Task<bool> RegisterAsync(RegisterRequest request)
         {
             // Check if user exists.
             if (await _dbContext.Users.AnyAsync(u => u.UserName == request.Username))
@@ -32,14 +35,32 @@ namespace ReviewVisualizer.WebApi.Services
             };
 
             _dbContext.Users.Add(user);
-            await _dbContext.SaveChangesAsync();
+            var recordsChanged = await _dbContext.SaveChangesAsync();
 
-            return new RegisterResponse(true, request.Username);
+            return recordsChanged > 0;
         }
 
-        private bool RegisterRequestIsValid()
+        public async Task<ClaimsPrincipal> LoginAsync(LoginRequest request)
         {
+            var user = await _dbContext.Users
+                .Include(u => u.Claims)
+                .FirstOrDefaultAsync(u => u.UserName == request.Username);
 
+            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+                    throw new UserUnauthenticatedException(request.Username, request.Password);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.UserName)
+            };
+
+            claims.AddRange(user.Claims.Select(c => new Claim(c.ClaimType, c.ClaimValue)));
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            return principal;
         }
     }
 }
