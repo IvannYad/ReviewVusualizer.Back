@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
+using ReviewVisualizer.AuthLibrary.Exceptions;
 using ReviewVisualizer.Data.Dto;
+using ReviewVisualizer.WebApi.Services;
 using LoginRequest = ReviewVisualizer.Data.Dto.LoginRequest;
 using RegisterRequest = ReviewVisualizer.Data.Dto.RegisterRequest;
 
@@ -9,16 +12,54 @@ namespace ReviewVisualizer.WebApi.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
+        private readonly AuthService _authService;
+
+        public AuthController(AuthService authService)
+        {
+            _authService = authService;
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> LogInAsync([FromBody] LoginRequest loginRequest)
         {
+            if (loginRequest is null)
+                return BadRequest("Login data is not provided");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            //var loginResponse = await _authService.
+
             return Ok(new LoginResponse(true));
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest registerRequest)
         {
-            return Ok(new RegisterResponse(true));
+            if (registerRequest is null)
+                return BadRequest("Register data is not provided");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var registerResponse = await _authService.RegisterAsync(registerRequest);
+
+                return Ok(registerResponse);
+            }
+            catch (UserAlreadyExistsException ex)
+            {
+                return BadRequest(ex);
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    title: "An unexpected server error ocurred",
+                    detail: ex.Message
+                );
+            }
         }
 
         [HttpPost("logoff")]

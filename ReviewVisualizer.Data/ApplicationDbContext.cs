@@ -26,10 +26,16 @@ namespace ReviewVisualizer.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Reviewer> Reviewers { get; set; }
         public DbSet<Analyst> Analysts { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserClaim> UserClaims { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserClaim>()
+                .HasIndex(uc => new { uc.UserId, uc.ClaimType })
+                .IsUnique();
         }
     }
 }

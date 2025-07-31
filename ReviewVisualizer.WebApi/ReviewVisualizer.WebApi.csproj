@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ReviewVisualizer.AuthLibrary\ReviewVisualizer.AuthLibrary.csproj" />
     <ProjectReference Include="..\ReviewVisualizer.Data\ReviewVisualizer.Data.csproj" />
   </ItemGroup>
 
