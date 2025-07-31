@@ -7,6 +7,8 @@ using System.Text.Json.Serialization;
 using Serilog;
 using Serilog.Events;
 using ReviewVisualizer.WebApi.Processor;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,11 +47,38 @@ builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>
 builder.Services.AddSingleton<IProcessorHost, ProcessorHost>();
 builder.Services.AddAutoMapper(typeof(MyMapper));
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.LoginPath = "/auth/login";
+        options.AccessDeniedPath = "/auth/access-denied";
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = 403;
+            return Task.CompletedTask;
+        };
+    });
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseCors();
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCookiePolicy(new CookiePolicyOptions()
+{
+    MinimumSameSitePolicy = SameSiteMode.Lax,
+    HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.None,
+});
 
 app.MapControllers();
 app.StartProcessorHost();

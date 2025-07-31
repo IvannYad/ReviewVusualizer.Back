@@ -7,6 +7,9 @@ using Serilog;
 using System.Text.Json.Serialization;
 using Serilog.Events;
 using Hangfire;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,33 +21,53 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+// Register Autofac-specific container.
+builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
+{
+    // Register ApplicationDbContext manually with configuration.
+    containerBuilder.Register(c =>
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+        return new ApplicationDbContext(optionsBuilder.Options);
+    }).AsSelf();
+
+    // Register custom services.
+    containerBuilder.RegisterType<QueueController>().As<IQueueController>().SingleInstance();
+    containerBuilder.RegisterType<GeneratorHost>().As<IGeneratorHost>();
+
+    // Register AutoMapper.
+    var mapperConfiguration = new MapperConfiguration(cfg => { cfg.AddProfile(new MyMapper()); });
+    var mapper = mapperConfiguration.CreateMapper();
+    containerBuilder.RegisterInstance(mapper).SingleInstance();
+
+    containerBuilder.RegisterGeneric(typeof(Logger<>))
+                    .As(typeof(ILogger<>))
+                    .SingleInstance();
+});
+
+
 builder.Services.AddControllers().AddJsonOptions(ops =>
 {
     ops.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins("*")
-           .WithHeaders("*")
-           .WithMethods("*")
-           .WithExposedHeaders("*")
-           .SetPreflightMaxAge(TimeSpan.FromSeconds(10));
+              .WithHeaders("*")
+              .WithMethods("*")
+              .WithExposedHeaders("*")
+              .SetPreflightMaxAge(TimeSpan.FromSeconds(10));
     });
 });
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-}, ServiceLifetime.Singleton);
-
-builder.Services.AddSingleton<IQueueController, QueueController>();
-
-builder.Services.AddSingleton<IGeneratorHost, GeneratorHost>();
-builder.Services.AddAutoMapper(typeof(MyMapper));
 
 builder.Services.AddHangfireServices(builder.Configuration);
 
@@ -55,7 +78,7 @@ app.UseCors();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseHangfireDashboard(options: new DashboardOptions()
+app.UseHangfireDashboard(options: new DashboardOptions
 {
     DashboardTitle = "Reviews processing dashboard"
 });

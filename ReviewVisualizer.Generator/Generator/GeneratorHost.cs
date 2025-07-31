@@ -1,5 +1,6 @@
-﻿using Hangfire;
-using Microsoft.AspNetCore.Mvc;
+﻿using Autofac;
+using AutoMapper;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Models;
@@ -10,20 +11,22 @@ namespace ReviewVisualizer.Generator.Generator
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<GeneratorHost> _logger;
-        private readonly IServiceProvider _services;
         private readonly List<Reviewer> _reviewers;
+        private readonly ILifetimeScope _container;
+        private readonly IMapper _mapper;
         private static object _locker = new object();
 
-        public GeneratorHost([FromServices] ApplicationDbContext dbContext,
-            [FromServices] ILogger<GeneratorHost> logger,
-            IServiceProvider services)
+        public GeneratorHost(ILifetimeScope container)
         {
             lock (_locker)
             {
-                _dbContext = dbContext;
-                _logger = logger;
-                _services = services;
+                _container = container;
+                var scope = _container.BeginLifetimeScope();
+                
+                _dbContext = scope.Resolve<ApplicationDbContext>();
+                _logger = scope.Resolve<ILogger<GeneratorHost>>();
                 _reviewers = _dbContext.Reviewers.Include(r => r.Teachers).ToList();
+                _mapper = scope.Resolve<IMapper>();
             }
         }
 
@@ -81,7 +84,9 @@ namespace ReviewVisualizer.Generator.Generator
                 if (reviewer is null)
                     throw new ArgumentNullException(nameof(reviewer));
 
-                reviewer.GenerateReview(_services, _dbContext);
+                using var scope = _container.BeginLifetimeScope();
+                var reviewerLogger = scope.Resolve<ILogger<Reviewer>>();
+                reviewer.GenerateReview(reviewerLogger, _mapper, _dbContext);
                 _logger.LogInformation($"Review generation job is scheduled from reviewer {reviewer.Name}");
             }
         }

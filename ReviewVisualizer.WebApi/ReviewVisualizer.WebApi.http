@@ -1,6 +1,0 @@
-@ReviewVisualizer.WebApi_HostAddress = http://localhost:5136
-
-GET {{ReviewVisualizer.WebApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

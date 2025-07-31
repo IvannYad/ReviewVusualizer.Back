@@ -5,6 +5,7 @@ using ReviewVisualizer.Data.Models;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Generator.Generator;
 using Microsoft.EntityFrameworkCore;
+using Autofac;
 
 namespace ReviewVisualizer.Generator.Controllers
 {
@@ -16,23 +17,26 @@ namespace ReviewVisualizer.Generator.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IGeneratorHost _generatorHost;
-        private readonly IServiceProvider _services;
+        private readonly ILifetimeScope _container;
 
-        public ReviewerController(ILogger<ReviewerController> logger,
-            ApplicationDbContext dbContext, IMapper mapper, [FromServices]IGeneratorHost generatorHost,
-            IServiceProvider services)
+        public ReviewerController(ILifetimeScope container)
         {
-            _logger = logger;
-            _dbContext = dbContext;
-            _mapper = mapper;
-            _generatorHost = generatorHost;
-            _services = services;
+            _container = container;
+
+            var scope = _container.BeginLifetimeScope();
+
+            _dbContext = scope.Resolve<ApplicationDbContext>();
+            _logger = scope.Resolve<ILogger<ReviewerController>>();
+            _mapper = scope.Resolve<IMapper>();
+            _generatorHost = scope.Resolve<IGeneratorHost>();
         }
 
         [HttpGet()]
         public IActionResult GetAll()
         {
-            var reviewers = _dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
+            using var scope = _container.BeginLifetimeScope();
+            var dbContext = scope.Resolve<ApplicationDbContext>();
+            var reviewers = dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
 
             return Ok(reviewers);
         }

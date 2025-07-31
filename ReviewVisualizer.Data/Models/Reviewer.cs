@@ -1,13 +1,12 @@
-﻿using AutoMapper;
+﻿using Autofac;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ReviewVisualizer.Data.Models
 {
@@ -49,10 +48,8 @@ namespace ReviewVisualizer.Data.Models
         [ValidateNever]
         public virtual ICollection<Teacher> Teachers { get; set; }
 
-        public void GenerateReview(IServiceProvider services, ApplicationDbContext dbContext)
+        public void GenerateReview(ILogger<Reviewer>? logger, IMapper? mapper, ApplicationDbContext dbContext)
         {
-            var logger = services?.GetService<ILogger<Reviewer>>();
-            var mapper = services?.GetService<IMapper>();
             if (mapper is null || logger is null)
                 throw new ArgumentNullException();
 
