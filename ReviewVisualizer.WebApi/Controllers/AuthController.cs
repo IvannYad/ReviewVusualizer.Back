@@ -50,7 +50,7 @@ namespace ReviewVisualizer.WebApi.Controllers
             }
             catch (UserAlreadyExistsException ex)
             {
-                return BadRequest(ex);
+                return BadRequest(new RegisterResponse(false, registerRequest.Username, ex.Message));
             }
             catch (Exception ex)
             {
