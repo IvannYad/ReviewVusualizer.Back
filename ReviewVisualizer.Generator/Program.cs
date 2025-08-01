@@ -10,6 +10,9 @@ using Hangfire;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using ReviewVisualizer.AuthLibrary.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,13 +64,39 @@ builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("*")
-              .WithHeaders("*")
-              .WithMethods("*")
-              .WithExposedHeaders("*")
-              .SetPreflightMaxAge(TimeSpan.FromSeconds(10));
+        policy.WithOrigins("https://localhost:3000") // Your React app URL
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetPreflightMaxAge(TimeSpan.FromSeconds(10))
+            .AllowCredentials();
     });
 });
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
+    .SetApplicationName("ReviewerVisualizer");
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "AuthCookie";
+        options.Cookie.Path = "/";
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        };
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            context.Response.StatusCode = 403;
+            return Task.CompletedTask;
+        };
+    });
+
+builder.Services.AddAuthorizationPolicies()
+    .AddAuthorizationHandlers();
 
 builder.Services.AddHangfireServices(builder.Configuration);
 
@@ -75,6 +104,15 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseCors();
+
+app.UseCookiePolicy(new CookiePolicyOptions()
+{
+    MinimumSameSitePolicy = SameSiteMode.Strict,
+    HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+    Secure = CookieSecurePolicy.Always,
+});
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

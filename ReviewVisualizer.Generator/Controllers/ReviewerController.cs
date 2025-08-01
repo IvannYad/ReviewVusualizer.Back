@@ -6,11 +6,15 @@ using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Generator.Generator;
 using Microsoft.EntityFrameworkCore;
 using Autofac;
+using Microsoft.AspNetCore.Authorization;
+using ReviewVisualizer.AuthLibrary;
+using ReviewVisualizer.Data.Enums;
 
 namespace ReviewVisualizer.Generator.Controllers
 {
     [ApiController]
     [Route("reviewers")]
+    [Authorize(Policy = Policies.GeneratorAdmin)]
     public class ReviewerController : ControllerBase
     {
         private readonly ILogger<ReviewerController> _logger;
@@ -18,8 +22,9 @@ namespace ReviewVisualizer.Generator.Controllers
         private readonly IMapper _mapper;
         private readonly IGeneratorHost _generatorHost;
         private readonly ILifetimeScope _container;
+        private readonly IAuthorizationService _authorizationService;
 
-        public ReviewerController(ILifetimeScope container)
+        public ReviewerController(ILifetimeScope container, IAuthorizationService authorizationService)
         {
             _container = container;
 
@@ -29,6 +34,13 @@ namespace ReviewVisualizer.Generator.Controllers
             _logger = scope.Resolve<ILogger<ReviewerController>>();
             _mapper = scope.Resolve<IMapper>();
             _generatorHost = scope.Resolve<IGeneratorHost>();
+            _authorizationService = authorizationService;
+        }
+
+        [HttpGet("try-access")]
+        public IActionResult TryAccess()
+        {
+            return Ok();
         }
 
         [HttpGet()]
@@ -42,8 +54,11 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost()]
-        public IActionResult Create([FromBody] ReviewerCreateDTO reviewerDTO)
+        public async Task<IActionResult> CreateAsync([FromBody] ReviewerCreateDTO reviewerDTO)
         {
+            if (!(await IsUserAuthorizedForModificationAsync(reviewerDTO.Type)))
+                return Forbid();
+
             var reviewer = _mapper.Map<Reviewer>(reviewerDTO);
             reviewer.Teachers = new List<Teacher>();
 
@@ -61,8 +76,11 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpDelete()]
-        public IActionResult Delete([FromQuery] int reviewerId)
+        public async Task<IActionResult> DeleteAsync([FromQuery] int reviewerId, [FromQuery] GeneratorType type)
         {
+            if (!(await IsUserAuthorizedForModificationAsync(type)))
+                return Forbid();
+
             Reviewer? reviewer = _dbContext.Reviewers.FirstOrDefault(t => t.Id == reviewerId);
             if (reviewer is null)
             {
@@ -80,8 +98,11 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost("generate-fire-and-forget")]
-        public IActionResult GenerateFireAndForget([FromQuery]int reviewerId)
+        public async Task<IActionResult> GenerateFireAndForgetAsync([FromQuery]int reviewerId)
         {
+            if (!(await IsUserAuthorizedForModificationAsync(GeneratorType.FIRE_AND_FORGET)))
+                return Forbid();
+
             var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
@@ -91,8 +112,11 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost("generate-delayed")]
-        public IActionResult GenerateDelayed([FromQuery] int reviewerId, [FromQuery] TimeSpan delay)
+        public async Task<IActionResult> GenerateDelayedAsync([FromQuery] int reviewerId, [FromQuery] TimeSpan delay)
         {
+            if (!(await IsUserAuthorizedForModificationAsync(GeneratorType.DELAYED)))
+                return Forbid();
+
             var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
@@ -102,8 +126,11 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost("generate-recurring")]
-        public IActionResult GenerateRecurring([FromQuery] int reviewerId, [FromQuery] string cron)
+        public async Task<IActionResult> GenerateRecurringAsync([FromQuery] int reviewerId, [FromQuery] string cron)
         {
+            if (!(await IsUserAuthorizedForModificationAsync(GeneratorType.RECURRING)))
+                return Forbid();
+
             var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
@@ -113,8 +140,11 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost("add-teachers")]
-        public IActionResult AddTeachers([FromQuery] int reviewerId, [FromBody] int[] teacherIds)
+        public async Task<IActionResult> AddTeachersAsync([FromQuery] int reviewerId, [FromQuery] GeneratorType type, [FromBody] int[] teacherIds)
         {
+            if (!(await IsUserAuthorizedForModificationAsync(type)))
+                return Forbid();
+
             var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
@@ -130,8 +160,11 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost("remove-teachers")]
-        public IActionResult StartReviewer([FromQuery] int reviewerId, [FromBody] int[] teacherIds)
+        public async Task<IActionResult> StartReviewerAsync([FromQuery] int reviewerId, [FromQuery] GeneratorType type, [FromBody] int[] teacherIds)
         {
+            if (!(await IsUserAuthorizedForModificationAsync(type)))
+                return Forbid();
+
             var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
@@ -142,6 +175,25 @@ namespace ReviewVisualizer.Generator.Controllers
 
             _logger.LogInformation($"Teachers [{string.Join(", ", deletedTeachers.Select(t => $"{t.FirstName} {t.LastName}"))}] are deleted from reviewer {reviewer.Name}");
             return Ok(teacherIds);
+        }
+
+        private async Task<bool> IsUserAuthorizedForModificationAsync(GeneratorType type)
+        {
+            string? policyName = type switch
+            {
+                GeneratorType.FIRE_AND_FORGET => Policies.ModifyFireAndForget,
+                GeneratorType.DELAYED => Policies.ModifyDelayed,
+                GeneratorType.RECURRING => Policies.ModifyRecurring,
+                _ => null
+            };
+
+            if (policyName is null)
+                return false;
+
+            // Inject IAuthorizationService into controller via DI
+            var authResult = await _authorizationService.AuthorizeAsync(User, policyName!);
+
+            return authResult.Succeeded;
         }
     }
 }

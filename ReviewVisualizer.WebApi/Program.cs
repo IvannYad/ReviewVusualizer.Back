@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Builder;
 using ReviewVisualizer.AuthLibrary;
 using Microsoft.AspNetCore.Authentication;
 using ReviewVisualizer.WebApi.Services;
+using ReviewVisualizer.AuthLibrary.Extensions;
+using Autofac.Core;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,11 +37,11 @@ builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // Your React app URL
+        policy.WithOrigins("https://localhost:3000") // Your React app URL
             .AllowAnyHeader()
             .AllowAnyMethod()
-           .SetPreflightMaxAge(TimeSpan.FromSeconds(10))
-           .AllowCredentials();
+            .SetPreflightMaxAge(TimeSpan.FromSeconds(10))
+            .AllowCredentials();
     });
 });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -53,13 +56,17 @@ builder.Services.AddAutoMapper(typeof(MyMapper));
 builder.Services.AddScoped(_ => new PasswordService(builder.Configuration["PasswordSecret"] ?? string.Empty));
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
+    .SetApplicationName("ReviewerVisualizer");
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.Name = "AuthCookie";
+        options.Cookie.Path = "/";
+        options.Cookie.SameSite = SameSiteMode.Strict;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.LoginPath = "/auth/login";
-        options.AccessDeniedPath = "/auth/access-denied";
         options.Events.OnRedirectToLogin = context =>
         {
             context.Response.StatusCode = 401;
@@ -72,23 +79,26 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         };
     });
 
+builder.Services.AddAuthorizationPolicies()
+    .AddAuthorizationHandlers();
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseCookiePolicy(new CookiePolicyOptions()
 {
-    MinimumSameSitePolicy = SameSiteMode.None,
+    MinimumSameSitePolicy = SameSiteMode.Strict,
     HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
     Secure = CookieSecurePolicy.Always,
 });
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseSwagger();
 
-// Enable middleware to serve Swagger UI (HTML, JS, CSS, etc.).
 app.UseSwaggerUI();
 
 app.MapControllers();
