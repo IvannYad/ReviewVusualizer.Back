@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.Data;
@@ -30,6 +31,15 @@ namespace ReviewVisualizer.WebApi.Controllers
         public IActionResult GetAll()
         {
             var departments = _dbContext.Departments.ToList();
+
+            if (!Request.Cookies.Any())
+            {
+                return Ok(new
+                {
+                    Message = "No cookies found in the request.",
+                    Cookies = Array.Empty<object>()
+                });
+            }
 
             return Ok(departments);
         }

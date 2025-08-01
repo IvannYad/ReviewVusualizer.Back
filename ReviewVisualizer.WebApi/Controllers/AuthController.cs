@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using ReviewVisualizer.AuthLibrary.Exceptions;
 using ReviewVisualizer.Data.Dto;
@@ -14,9 +13,9 @@ namespace ReviewVisualizer.WebApi.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public AuthController(AuthService authService)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
         }
@@ -69,11 +68,11 @@ namespace ReviewVisualizer.WebApi.Controllers
             {
                 var registerResponse = await _authService.RegisterAsync(registerRequest);
 
-                return Ok(new RegisterResponse(registerResponse));
+                return Ok(new RegisterResponse(registerResponse, registerRequest.Username, registerRequest.Password));
             }
             catch (UserAlreadyExistsException ex)
             {
-                return BadRequest(new RegisterResponse(false, registerRequest.Username, ex.Message));
+                return BadRequest(new RegisterResponse(false, registerRequest.Username, registerRequest.Password, ex.Message));
             }
             catch (Exception ex)
             {
@@ -88,7 +87,14 @@ namespace ReviewVisualizer.WebApi.Controllers
         [HttpPost("logoff")]
         public async Task<IActionResult> LogoffAsync([FromBody] LogoffRequest logoffRequest)
         {
-            return Ok(new LogoffResponse(true));
+            if (logoffRequest is null)
+                return BadRequest("Logoff data is not provided");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return NoContent();
         }
     }
 }

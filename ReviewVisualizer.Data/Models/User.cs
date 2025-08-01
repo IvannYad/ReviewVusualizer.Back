@@ -7,6 +7,6 @@
         public string PasswordHash { get; set; }
         public bool Blocked { get; set; }
 
-        public List<UserClaim> Claims { get; set; }
+        public List<UserClaim> Claims { get; set; } = new List<UserClaim>();
     }
 }

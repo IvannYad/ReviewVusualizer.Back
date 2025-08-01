@@ -1,17 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.AuthLibrary;
+using ReviewVisualizer.AuthLibrary.Enums;
 using ReviewVisualizer.AuthLibrary.Exceptions;
+using ReviewVisualizer.AuthLibrary.Extensions;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Models;
 using System.Security.Claims;
+using MyClaimTypes = ReviewVisualizer.AuthLibrary.Enums.ClaimTypes;
+using ClaimTypes = System.Security.Claims.ClaimTypes;
 
 namespace ReviewVisualizer.WebApi.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly PasswordService _passwordService;
@@ -34,6 +36,9 @@ namespace ReviewVisualizer.WebApi.Services
                 PasswordHash = _passwordService.HashPassword(request.Password)
             };
 
+            user.SetSystemRoles(SystemRoles.Visitor);
+            user.SetGeneratorModifications(GeneratorModifications.View);
+
             _dbContext.Users.Add(user);
             var recordsChanged = await _dbContext.SaveChangesAsync();
 
@@ -46,8 +51,8 @@ namespace ReviewVisualizer.WebApi.Services
                 .Include(u => u.Claims)
                 .FirstOrDefaultAsync(u => u.UserName == request.Username);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                    throw new UserUnauthenticatedException(request.Username, request.Password);
+            if (user == null || !_passwordService.VerifyPassword(user.PasswordHash, request.Password))
+                throw new UserUnauthenticatedException(request.Username, request.Password);
 
             var claims = new List<Claim>
             {

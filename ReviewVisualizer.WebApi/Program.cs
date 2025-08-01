@@ -9,6 +9,9 @@ using Serilog.Events;
 using ReviewVisualizer.WebApi.Processor;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using ReviewVisualizer.AuthLibrary;
+using Microsoft.AspNetCore.Authentication;
+using ReviewVisualizer.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,11 +34,11 @@ builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("*")
-           .WithHeaders("*")
-           .WithMethods("*")
-           .WithExposedHeaders("*")
-           .SetPreflightMaxAge(TimeSpan.FromSeconds(10));
+        policy.WithOrigins("http://localhost:3000") // Your React app URL
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+           .SetPreflightMaxAge(TimeSpan.FromSeconds(10))
+           .AllowCredentials();
     });
 });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -47,10 +50,13 @@ builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>
 builder.Services.AddSingleton<IProcessorHost, ProcessorHost>();
 builder.Services.AddAutoMapper(typeof(MyMapper));
 
+builder.Services.AddScoped(_ => new PasswordService(builder.Configuration["PasswordSecret"] ?? string.Empty));
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SameSite = SameSiteMode.None;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.LoginPath = "/auth/login";
         options.AccessDeniedPath = "/auth/access-denied";
@@ -75,10 +81,15 @@ app.UseAuthorization();
 
 app.UseCookiePolicy(new CookiePolicyOptions()
 {
-    MinimumSameSitePolicy = SameSiteMode.Lax,
+    MinimumSameSitePolicy = SameSiteMode.None,
     HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
-    Secure = CookieSecurePolicy.None,
+    Secure = CookieSecurePolicy.Always,
 });
+
+app.UseSwagger();
+
+// Enable middleware to serve Swagger UI (HTML, JS, CSS, etc.).
+app.UseSwaggerUI();
 
 app.MapControllers();
 app.StartProcessorHost();

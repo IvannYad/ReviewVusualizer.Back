@@ -1,0 +1,48 @@
+﻿using ReviewVisualizer.AuthLibrary.Enums;
+using ReviewVisualizer.Data.Models;
+using System.ComponentModel;
+using System.Reflection;
+
+namespace ReviewVisualizer.AuthLibrary.Extensions
+{
+    public static class UserExtensions
+    {
+        public static void SetSystemRoles(this User user, SystemRoles roles)
+        {
+            if (user is null) return;
+
+            string claimType = GetClaimType(ClaimTypes.SystemRole);
+
+            SetClaims(user, claimType, Convert.ToInt32(roles).ToString());
+        }
+
+        public static void SetGeneratorModifications(this User user, GeneratorModifications modifications)
+        {
+            if (user is null) return;
+
+            string claimType = GetClaimType(ClaimTypes.GeneratorModifications);
+
+            SetClaims(user, claimType, Convert.ToInt32(modifications).ToString());
+        }
+
+        private static void SetClaims(User user, string claimType, string claimValue)
+        {
+            var claim = user.Claims.FirstOrDefault(c => c.ClaimType == claimType);
+            if (claim is not null)
+                claim.ClaimValue = claimValue;
+            else
+                user.Claims.Add(new UserClaim
+                {
+                    ClaimType = claimType,
+                    ClaimValue = claimValue
+                });
+        }
+
+        private static string GetClaimType(ClaimTypes claimType)
+        {
+            var field = claimType.GetType().GetField(claimType.ToString());
+            var attr = field?.GetCustomAttribute<DescriptionAttribute>();
+            return attr?.Description ?? claimType.ToString();
+        }
+    }
+}

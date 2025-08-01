@@ -33,7 +33,7 @@ namespace ReviewVisualizer.Data.Dto
         public string PasswordConfirmation { get; init; }
     }
 
-    public record RegisterResponse(bool Success, string? UserName = null, string? Error = null);
+    public record RegisterResponse(bool Success, string? UserName = null, string? Password = null, string? Error = null);
 
     public record LogoffRequest
     {
