@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using ReviewVisualizer.AuthLibrary.Enums;
-using System.Security.Claims;
+using ReviewVisualizer.Data.Enums;
 
 namespace ReviewVisualizer.AuthLibrary.Requirements
 {
@@ -22,7 +21,7 @@ namespace ReviewVisualizer.AuthLibrary.Requirements
 
             if (Enum.TryParse(roleClaim, out SystemRoles userLevel))
             {
-                if (userLevel.HasFlag(requirement.Role))
+                if (userLevel.HasFlag(requirement.Role) || userLevel.HasFlag(SystemRoles.Owner))
                 {
                     context.Succeed(requirement);
                 }

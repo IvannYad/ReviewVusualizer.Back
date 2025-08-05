@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
@@ -56,6 +57,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         }
 
         [HttpPost()]
+        [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult Create([FromBody] DepartmentCreateDTO dept)
         {
             _dbContext.Departments.Add(_mapper.Map<Department>(dept));
@@ -64,6 +66,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         }
 
         [HttpPost("upload-image")]
+        [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult UploadImage([FromForm] IFormFile deptIcon)
         {
             string name = $"departments_{Guid.NewGuid().ToString()}_{deptIcon.FileName}";
@@ -81,6 +84,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         }
 
         [HttpPost("delete-image")]
+        [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult DeleteImage([FromQuery] string imgName)
         {
             try

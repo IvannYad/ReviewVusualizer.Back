@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
-using ReviewVisualizer.AuthLibrary.Enums;
 using ReviewVisualizer.AuthLibrary.Requirements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ReviewVisualizer.Data.Enums;
 
 namespace ReviewVisualizer.AuthLibrary.Extensions
 {
@@ -17,7 +12,7 @@ namespace ReviewVisualizer.AuthLibrary.Extensions
             services.AddAuthorization(options =>
             {
                 // Role-based.
-                options.AddPolicy(Policies.GeneratorAdmin, p => p.Requirements.Add(new RoleRequirement(SystemRoles.GeneratorAdmin)));
+                options.AddPolicy(Policies.RequireGeneratorAdmin, p => p.Requirements.Add(new RoleRequirement(SystemRoles.GeneratorAdmin)));
                 options.AddPolicy(Policies.RequireAnalyst, p => p.Requirements.Add(new RoleRequirement(SystemRoles.Analyst)));
                 options.AddPolicy(Policies.RequireOwner, p => p.Requirements.Add(new RoleRequirement(SystemRoles.Owner)));
                 options.AddPolicy(Policies.RequireVisitor, p => p.Requirements.Add(new RoleRequirement(SystemRoles.Visitor)));

@@ -8,7 +8,7 @@ namespace ReviewVisualizer.AuthLibrary
 {
     public static class Policies
     {
-        public const string GeneratorAdmin = "GeneratorAdmin";
+        public const string RequireGeneratorAdmin = "RequireGeneratorAdmin";
         public const string RequireAnalyst = "RequireAnalyst";
         public const string RequireOwner = "RequireOwner";
         public const string RequireVisitor = "RequireVisitor";
@@ -19,7 +19,7 @@ namespace ReviewVisualizer.AuthLibrary
 
         public static IEnumerable<string> All => new[]
         {
-            GeneratorAdmin, RequireAnalyst, RequireOwner, RequireVisitor,
+            RequireGeneratorAdmin, RequireAnalyst, RequireOwner, RequireVisitor,
             ModifyFireAndForget, ModifyDelayed, ModifyRecurring
         };
     }

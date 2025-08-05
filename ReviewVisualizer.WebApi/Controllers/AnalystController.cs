@@ -9,10 +9,6 @@ namespace ReviewVisualizer.Generator.Controllers
     [Authorize(Policy = Policies.RequireAnalyst)]
     public class AnalystController : ControllerBase
     {
-        [HttpGet("try-access")]
-        public IActionResult TryAccess()
-        {
-            return Ok();
-        }
+        // Nothing here.
     }
 }

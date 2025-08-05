@@ -1,7 +1,6 @@
 ﻿using ReviewVisualizer.AuthLibrary.Enums;
+using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
-using System.ComponentModel;
-using System.Reflection;
 
 namespace ReviewVisualizer.AuthLibrary.Extensions
 {
@@ -11,7 +10,7 @@ namespace ReviewVisualizer.AuthLibrary.Extensions
         {
             if (user is null) return;
 
-            string claimType = GetClaimType(ClaimTypes.SystemRole);
+            string claimType = ClaimTypes.SystemRole.GetClaimType();
 
             SetClaims(user, claimType, Convert.ToInt32(roles).ToString());
         }
@@ -20,7 +19,7 @@ namespace ReviewVisualizer.AuthLibrary.Extensions
         {
             if (user is null) return;
 
-            string claimType = GetClaimType(ClaimTypes.GeneratorModifications);
+            string claimType = ClaimTypes.GeneratorModifications.GetClaimType();
 
             SetClaims(user, claimType, Convert.ToInt32(modifications).ToString());
         }
@@ -36,13 +35,6 @@ namespace ReviewVisualizer.AuthLibrary.Extensions
                     ClaimType = claimType,
                     ClaimValue = claimValue
                 });
-        }
-
-        private static string GetClaimType(ClaimTypes claimType)
-        {
-            var field = claimType.GetType().GetField(claimType.ToString());
-            var attr = field?.GetCustomAttribute<DescriptionAttribute>();
-            return attr?.Description ?? claimType.ToString();
         }
     }
 }

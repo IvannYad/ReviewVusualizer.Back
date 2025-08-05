@@ -29,6 +29,6 @@ namespace ReviewVisualizer.Data.Models
         [ForeignKey("Teacher")]
         public int TeacherId { get; set; }
 
-        public Teacher Teacher { get; set; }
+        public virtual Teacher Teacher { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ReviewVisualizer.AuthLibrary.Enums
+﻿namespace ReviewVisualizer.Data.Enums
 {
     [Flags]
     public enum GeneratorModifications

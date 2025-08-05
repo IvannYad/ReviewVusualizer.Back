@@ -14,7 +14,7 @@ namespace ReviewVisualizer.Generator.Controllers
 {
     [ApiController]
     [Route("reviewers")]
-    [Authorize(Policy = Policies.GeneratorAdmin)]
+    [Authorize(Policy = Policies.RequireGeneratorAdmin)]
     public class ReviewerController : ControllerBase
     {
         private readonly ILogger<ReviewerController> _logger;
@@ -35,12 +35,6 @@ namespace ReviewVisualizer.Generator.Controllers
             _mapper = scope.Resolve<IMapper>();
             _generatorHost = scope.Resolve<IGeneratorHost>();
             _authorizationService = authorizationService;
-        }
-
-        [HttpGet("try-access")]
-        public IActionResult TryAccess()
-        {
-            return Ok();
         }
 
         [HttpGet()]

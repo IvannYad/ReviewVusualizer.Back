@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Models;
 using ReviewVisualizer.Data.Dto;
-using ReviewVisualizer.Data.Mapper;
 using System.Drawing;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.Data.Enums;
 using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Authorization;
+using ReviewVisualizer.AuthLibrary;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -58,6 +59,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         }
 
         [HttpPost()]
+        [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult Create([FromBody] TeacherCreateDTO dept)
         {
             lock (_lock)
@@ -69,6 +71,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         }
 
         [HttpDelete()]
+        [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult Delete([FromQuery] int teacherId)
         {
             Teacher? teacher = _dbContext.Teachers.FirstOrDefault(t => t.Id == teacherId);
@@ -91,6 +94,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         }
 
         [HttpPost("upload-image")]
+        [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult UploadImage([FromForm] IFormFile deptIcon)
         {
             string name = $"teachers_{Guid.NewGuid().ToString()}_{deptIcon.FileName}";
@@ -108,6 +112,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         }
 
         [HttpPost("delete-image")]
+        [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult DeleteImage([FromQuery] string imgName)
         {
             try

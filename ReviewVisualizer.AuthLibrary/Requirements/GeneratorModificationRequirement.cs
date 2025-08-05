@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using ReviewVisualizer.AuthLibrary.Enums;
+using ReviewVisualizer.Data.Enums;
 
 namespace ReviewVisualizer.AuthLibrary.Requirements
 {

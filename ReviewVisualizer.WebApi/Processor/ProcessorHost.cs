@@ -21,45 +21,40 @@ namespace ReviewVisualizer.WebApi.Processor
             [FromServices] ILogger<ProcessorHost> logger,
             [FromServices] ILogger<Analyst> analystLogger)
         {
-            _dbContext = dbContext;
-            _logger = logger;
-            _analystLogger = analystLogger;
-            _queue = queue;
-            _reviewers = _dbContext.Analysts.ToList();
-            _analystCollection = new Dictionary<Analyst, Thread?>();
+            
         }
 
         public void Init()
         {
-            if (_isInitialized) return;
+            //if (_isInitialized) return;
 
-            _reviewers.ForEach(a => _analystCollection.Add(a, new Thread(() => a
-                .ProcessReview(ApplicationDbContext.CreateNew(_dbContext), _queue, _analystLogger))));
-            foreach (var an in _analystCollection.Keys)
-            {
-                an.ThreadCompleted += OnWorkerStopped;
-            }
+            //_reviewers.ForEach(a => _analystCollection.Add(a, new Thread(() => a
+            //    .ProcessReview(ApplicationDbContext.CreateNew(_dbContext), _queue, _analystLogger))));
+            //foreach (var an in _analystCollection.Keys)
+            //{
+            //    an.ThreadCompleted += OnWorkerStopped;
+            //}
 
-            _isInitialized = true;
+            //_isInitialized = true;
         }
 
         public void Start()
         {
-            if (!_isInitialized) return;
+            //if (!_isInitialized) return;
 
-            _logger.LogInformation($"[ProcessorHost] Processor Host started");
-            foreach (var t in _analystCollection)
-            {
-                if (!_reviewers.FirstOrDefault(r => r.Id == t.Key.Id)?.IsStopped ?? false && t.Value is not null)
-                {
-                    _logger.LogInformation($"[ProcessorHost] Analyst {t.Key.Name} is started");
-                    t.Value?.Start();
-                }
-                else
-                {
-                    _analystCollection[t.Key] = null;
-                }
-            }
+            //_logger.LogInformation($"[ProcessorHost] Processor Host started");
+            //foreach (var t in _analystCollection)
+            //{
+            //    if (!_reviewers.FirstOrDefault(r => r.Id == t.Key.Id)?.IsStopped ?? false && t.Value is not null)
+            //    {
+            //        _logger.LogInformation($"[ProcessorHost] Analyst {t.Key.Name} is started");
+            //        t.Value?.Start();
+            //    }
+            //    else
+            //    {
+            //        _analystCollection[t.Key] = null;
+            //    }
+            //}
         }
 
         public bool CreateAnalyst(Analyst analyst)

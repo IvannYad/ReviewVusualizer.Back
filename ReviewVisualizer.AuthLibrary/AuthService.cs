@@ -10,6 +10,7 @@ using ReviewVisualizer.Data.Models;
 using System.Security.Claims;
 using MyClaimTypes = ReviewVisualizer.AuthLibrary.Enums.ClaimTypes;
 using ClaimTypes = System.Security.Claims.ClaimTypes;
+using ReviewVisualizer.Data.Enums;
 
 namespace ReviewVisualizer.WebApi.Services
 {

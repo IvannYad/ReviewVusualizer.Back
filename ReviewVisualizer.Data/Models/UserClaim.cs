@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Claims;
 
 namespace ReviewVisualizer.Data.Models
 {
@@ -8,7 +10,7 @@ namespace ReviewVisualizer.Data.Models
         
         [ForeignKey(nameof(User))]
         public int UserId { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
 
         public string ClaimType { get; set; }
         public string ClaimValue { get; set; }

@@ -6,6 +6,8 @@ using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.WebApi.Services;
 using LoginRequest = ReviewVisualizer.Data.Dto.LoginRequest;
 using RegisterRequest = ReviewVisualizer.Data.Dto.RegisterRequest;
+using Microsoft.AspNetCore.Authorization;
+using ReviewVisualizer.AuthLibrary;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -37,6 +39,18 @@ namespace ReviewVisualizer.WebApi.Controllers
                     {
                         IsPersistent = true,
                         ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                    });
+
+                HttpContext.Response.Cookies.Append(
+                    "UserName",
+                    loginRequest.Username,
+                    new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddHours(1),
+                        HttpOnly = false,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        IsEssential = true // important if you use cookie consent
                     });
 
                 return Ok(new LoginResponse(true));
@@ -93,8 +107,47 @@ namespace ReviewVisualizer.WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // Remove cusotm cookie "UserName"
+            foreach (var cookie in Request.Cookies.Keys)
+            {
+                Response.Cookies.Delete(cookie, new CookieOptions
+                {
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Path = "/",
+                });
+            }
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return NoContent();
+        }
+
+        [HttpGet("try-visitor-access")]
+        [Authorize(Policy = Policies.RequireVisitor)]
+        public IActionResult TryVisitorAccess()
+        {
+            return Ok();
+        }
+
+        [HttpGet("try-analyst-access")]
+        [Authorize(Policy = Policies.RequireAnalyst)]
+        public IActionResult TryAnalystAccess()
+        {
+            return Ok();
+        }
+
+        [HttpGet("try-generator-access")]
+        [Authorize(Policy = Policies.RequireGeneratorAdmin)]
+        public IActionResult TryGeneratorAccess()
+        {
+            return Ok();
+        }
+
+        [HttpGet("try-owner-access")]
+        [Authorize(Policy = Policies.RequireOwner)]
+        public IActionResult TryOwnerAccess()
+        {
+            return Ok();
         }
     }
 }

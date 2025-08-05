@@ -5,8 +5,6 @@
         public int Id { get; set; }
         public string UserName { get; set; }
         public string PasswordHash { get; set; }
-        public bool Blocked { get; set; }
-
-        public List<UserClaim> Claims { get; set; } = new List<UserClaim>();
+        public virtual List<UserClaim> Claims { get; set; } = new List<UserClaim>();
     }
 }

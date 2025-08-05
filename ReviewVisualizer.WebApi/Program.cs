@@ -46,7 +46,8 @@ builder.Services.AddCors(opt =>
 });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+        .UseLazyLoadingProxies();
 }, ServiceLifetime.Singleton);
 builder.Services.AddSingleton<IQueueController, QueueController>();
 builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>();
@@ -90,7 +91,7 @@ app.UseCors();
 app.UseCookiePolicy(new CookiePolicyOptions()
 {
     MinimumSameSitePolicy = SameSiteMode.Strict,
-    HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
+    HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.None,
     Secure = CookieSecurePolicy.Always,
 });
 
