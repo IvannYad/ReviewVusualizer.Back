@@ -46,8 +46,7 @@ builder.Services.AddCors(opt =>
 });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-        .UseLazyLoadingProxies();
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 }, ServiceLifetime.Singleton);
 builder.Services.AddSingleton<IQueueController, QueueController>();
 builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>();

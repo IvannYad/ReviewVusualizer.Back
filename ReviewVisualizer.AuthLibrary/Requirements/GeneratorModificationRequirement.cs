@@ -19,7 +19,7 @@ namespace ReviewVisualizer.AuthLibrary.Requirements
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, GeneratorModificationRequirement requirement)
         {
-            var generatorClaim = context.User.FindFirst(ClaimTypes.SystemRole.GetClaimType())?.Value;
+            var generatorClaim = context.User.FindFirst(ClaimTypes.GeneratorModifications.GetClaimType())?.Value;
             var roleClaim = context.User.FindFirst(ClaimTypes.SystemRole.GetClaimType())?.Value;
 
             if (Enum.TryParse(generatorClaim, out GeneratorModifications userLevel))

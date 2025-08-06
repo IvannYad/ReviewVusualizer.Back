@@ -56,7 +56,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            var user = _dbContext.Users.FirstOrDefault(u => u.Id == dto.UserId);
+            var user = _dbContext.Users.Include(u => u.Claims).FirstOrDefault(u => u.Id == dto.UserId);
 
             if (user is null)
                 return NotFound();
