@@ -82,7 +82,7 @@ namespace ReviewVisualizer.Generator.Generator
             {
                 var reviewer = _reviewers.FirstOrDefault(r => r.Id == reviewerId);
                 if (reviewer is null)
-                    throw new ArgumentNullException(nameof(reviewer));
+                    return;
 
                 using var scope = _container.BeginLifetimeScope();
                 var reviewerLogger = scope.Resolve<ILogger<Reviewer>>();

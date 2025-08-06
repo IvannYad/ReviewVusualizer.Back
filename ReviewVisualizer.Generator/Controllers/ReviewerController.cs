@@ -70,16 +70,13 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpDelete()]
-        public async Task<IActionResult> DeleteAsync([FromQuery] int reviewerId, [FromQuery] GeneratorType type)
+        public async Task<IActionResult> DeleteAsync([FromQuery] int reviewerId)
         {
-            if (!(await IsUserAuthorizedForModificationAsync(type)))
-                return Forbid();
+            var reviewer = await _dbContext.Reviewers.FirstOrDefaultAsync(r => r.Id == reviewerId);
+            if (reviewer is null) return Ok();
 
-            Reviewer? reviewer = _dbContext.Reviewers.FirstOrDefault(t => t.Id == reviewerId);
-            if (reviewer is null)
-            {
-                return Ok();
-            }
+            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type)))
+                return Forbid();
 
             if (_generatorHost.DeleteReviewer(reviewer.Id))
             {
@@ -134,13 +131,13 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost("add-teachers")]
-        public async Task<IActionResult> AddTeachersAsync([FromQuery] int reviewerId, [FromQuery] GeneratorType type, [FromBody] int[] teacherIds)
+        public async Task<IActionResult> AddTeachersAsync([FromQuery] int reviewerId, [FromBody] int[] teacherIds)
         {
-            if (!(await IsUserAuthorizedForModificationAsync(type)))
-                return Forbid();
-
-            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
+            var reviewer = _dbContext.Reviewers.Include(r => r.Teachers).FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
+
+            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type)))
+                return Forbid();
 
             if(reviewer.Teachers is null) reviewer.Teachers = new List<Teacher>();
             var newTeachersForReview = teacherIds.Where(id => !reviewer.Teachers.Any(teacher => teacher.Id == id));
@@ -154,13 +151,13 @@ namespace ReviewVisualizer.Generator.Controllers
         }
 
         [HttpPost("remove-teachers")]
-        public async Task<IActionResult> StartReviewerAsync([FromQuery] int reviewerId, [FromQuery] GeneratorType type, [FromBody] int[] teacherIds)
+        public async Task<IActionResult> RemoveTeachers([FromQuery] int reviewerId, [FromBody] int[] teacherIds)
         {
-            if (!(await IsUserAuthorizedForModificationAsync(type)))
-                return Forbid();
-
-            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
+            var reviewer = _dbContext.Reviewers.Include(r => r.Teachers).FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
+
+            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type)))
+                return Forbid();
 
             var deletedTeachers = reviewer.Teachers.Where(t => teacherIds.Contains(t.Id)).ToList();
             reviewer.Teachers = reviewer.Teachers.Where(t => !teacherIds.Contains(t.Id)).ToList();

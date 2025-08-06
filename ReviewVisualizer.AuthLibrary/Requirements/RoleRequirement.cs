@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using ReviewVisualizer.AuthLibrary.Enums;
+using ReviewVisualizer.AuthLibrary.Extensions;
 using ReviewVisualizer.Data.Enums;
 
 namespace ReviewVisualizer.AuthLibrary.Requirements
@@ -17,7 +19,7 @@ namespace ReviewVisualizer.AuthLibrary.Requirements
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, RoleRequirement requirement)
         {
-            var roleClaim = context.User.FindFirst("system_role")?.Value;
+            var roleClaim = context.User.FindFirst(ClaimTypes.SystemRole.GetClaimType())?.Value;
 
             if (Enum.TryParse(roleClaim, out SystemRoles userLevel))
             {

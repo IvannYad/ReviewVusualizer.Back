@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using ReviewVisualizer.AuthLibrary.Enums;
+using ReviewVisualizer.AuthLibrary.Extensions;
 using ReviewVisualizer.Data.Enums;
 
 namespace ReviewVisualizer.AuthLibrary.Requirements
@@ -17,13 +19,23 @@ namespace ReviewVisualizer.AuthLibrary.Requirements
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, GeneratorModificationRequirement requirement)
         {
-            var claim = context.User.FindFirst("generator_modification")?.Value;
+            var generatorClaim = context.User.FindFirst(ClaimTypes.SystemRole.GetClaimType())?.Value;
+            var roleClaim = context.User.FindFirst(ClaimTypes.SystemRole.GetClaimType())?.Value;
 
-            if (Enum.TryParse(claim, out GeneratorModifications userLevel))
+            if (Enum.TryParse(generatorClaim, out GeneratorModifications userLevel))
             {
                 if (userLevel.HasFlag(requirement.RequiredLevel))
                 {
                     context.Succeed(requirement);
+                } else
+                {
+                    if (Enum.TryParse(roleClaim, out SystemRoles role))
+                    {
+                        if (role.HasFlag(SystemRoles.Owner))
+                        {
+                            context.Succeed(requirement);
+                        }
+                    }
                 }
             }
 
