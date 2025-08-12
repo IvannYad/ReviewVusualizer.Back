@@ -8,15 +8,15 @@ using Serilog;
 using Serilog.Events;
 using ReviewVisualizer.WebApi.Processor;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
 using ReviewVisualizer.AuthLibrary;
-using Microsoft.AspNetCore.Authentication;
 using ReviewVisualizer.WebApi.Services;
 using ReviewVisualizer.AuthLibrary.Extensions;
-using Autofac.Core;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 Log.Logger = new LoggerConfiguration()
@@ -26,28 +26,36 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-builder.Services.AddControllers().AddJsonOptions(ops =>
+builder.Services.AddControllers(options =>
+{
+    options.RespectBrowserAcceptHeader = false;
+}).AddJsonOptions(ops =>
 {
     ops.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-});
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+})
+    .AddXmlDataContractSerializerFormatters();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://localhost:3000") // Your React app URL
+        policy.WithOrigins("https://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .SetPreflightMaxAge(TimeSpan.FromSeconds(10))
             .AllowCredentials();
     });
 });
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 }, ServiceLifetime.Singleton);
+if (builder.Environment.IsDevelopment())
+    builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
 builder.Services.AddSingleton<IQueueController, QueueController>();
 builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>();
 builder.Services.AddSingleton<IProcessorHost, ProcessorHost>();
@@ -82,26 +90,43 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorizationPolicies()
     .AddAuthorizationHandlers();
 
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = (ctx) => builder.Environment.IsDevelopment();
+});
+
 var app = builder.Build();
+
+// Global exception handling.
+if (app.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
+else
+    app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
 app.UseCors();
-
 app.UseCookiePolicy(new CookiePolicyOptions()
 {
     MinimumSameSitePolicy = SameSiteMode.Strict,
     HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.None,
     Secure = CookieSecurePolicy.Always,
 });
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseSwagger();
-
 app.UseSwaggerUI();
 
 app.MapControllers();
+
 app.StartProcessorHost();
 app.StartRatingCalculationEngine();
+
+var mvcOpts = app.Services.GetRequiredService<IOptions<MvcOptions>>();
+foreach (var f in mvcOpts.Value.OutputFormatters)
+{
+    Console.WriteLine(f.GetType().FullName);
+}
+
 app.Run();

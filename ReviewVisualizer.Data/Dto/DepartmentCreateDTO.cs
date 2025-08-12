@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ReviewVisualizer.Data.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace ReviewVisualizer.Data.Dto
 {
     public class DepartmentCreateDTO
     {
         [Required]
-        [RegularExpression(@"^[A-Z]+$")]
+        [ValidDepartmentName]
         public string Name { get; set; }
 
         [Required]

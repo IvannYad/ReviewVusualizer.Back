@@ -28,9 +28,6 @@ namespace ReviewVisualizer.WebApi.Controllers
             if (loginRequest is null)
                 return BadRequest("Login data is not provided");
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             try
             {
                 var principal = await _authService.LoginAsync(loginRequest);
@@ -59,14 +56,6 @@ namespace ReviewVisualizer.WebApi.Controllers
             {
                 return Unauthorized(new LoginResponse(false, ex.Message));
             }
-            catch (Exception ex)
-            {
-                return Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    title: "An unexpected server error ocurred",
-                    detail: ex.Message
-                );
-            }
         }
 
         [HttpPost("register")]
@@ -74,9 +63,6 @@ namespace ReviewVisualizer.WebApi.Controllers
         {
             if (registerRequest is null)
                 return BadRequest("Register data is not provided");
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             try
             {
@@ -88,14 +74,6 @@ namespace ReviewVisualizer.WebApi.Controllers
             {
                 return BadRequest(new RegisterResponse(false, registerRequest.Username, registerRequest.Password, ex.Message));
             }
-            catch (Exception ex)
-            {
-                return Problem(
-                    statusCode: StatusCodes.Status500InternalServerError,
-                    title: "An unexpected server error ocurred",
-                    detail: ex.Message
-                );
-            }
         }
 
         [HttpPost("logoff")]
@@ -103,9 +81,6 @@ namespace ReviewVisualizer.WebApi.Controllers
         {
             if (logoffRequest is null)
                 return BadRequest("Logoff data is not provided");
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             // Remove cusotm cookie "UserName"
             foreach (var cookie in Request.Cookies.Keys)

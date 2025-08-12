@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.Data;
@@ -8,8 +9,6 @@ using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
 using System.Drawing;
-using System.IO;
-using System.Runtime.CompilerServices;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -17,6 +16,8 @@ namespace ReviewVisualizer.WebApi.Controllers
     [Route("departments")]
     public class DepartmentController : ControllerBase
     {
+        private string[] permittedPhotoExtensions = { ".png", ".jpg" };
+
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly string _imagesStoragePath;
@@ -32,15 +33,6 @@ namespace ReviewVisualizer.WebApi.Controllers
         public IActionResult GetAll()
         {
             var departments = _dbContext.Departments.ToList();
-
-            if (!Request.Cookies.Any())
-            {
-                return Ok(new
-                {
-                    Message = "No cookies found in the request.",
-                    Cookies = Array.Empty<object>()
-                });
-            }
 
             return Ok(departments);
         }
@@ -69,7 +61,11 @@ namespace ReviewVisualizer.WebApi.Controllers
         [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult UploadImage([FromForm] IFormFile deptIcon)
         {
-            string name = $"departments_{Guid.NewGuid().ToString()}_{deptIcon.FileName}";
+            var ext = Path.GetExtension(deptIcon.FileName).ToLowerInvariant();
+            if (string.IsNullOrEmpty(ext) || !permittedPhotoExtensions.Contains(ext))
+                return BadRequest("Invalid photo file extension");
+
+            string name = $"departments_{Guid.NewGuid()}_{deptIcon.FileName}";
             using var memoryStream = new MemoryStream();
             deptIcon.CopyTo(memoryStream);
 
@@ -87,20 +83,13 @@ namespace ReviewVisualizer.WebApi.Controllers
         [Authorize(Policy = Policies.RequireAnalyst)]
         public IActionResult DeleteImage([FromQuery] string imgName)
         {
-            try
+            string imgFullPath = Path.Combine(_imagesStoragePath, imgName);
+            if (System.IO.File.Exists(imgFullPath))
             {
-                string imgFullPath = Path.Combine(_imagesStoragePath, imgName);
-                if (System.IO.File.Exists(imgFullPath))
-                {
-                    System.IO.File.Delete(imgFullPath);
-                }
+                System.IO.File.Delete(imgFullPath);
+            }
 
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
+            return Ok();
         }
 
         [HttpGet("get-grade/{departmentId:int}")]
@@ -113,17 +102,18 @@ namespace ReviewVisualizer.WebApi.Controllers
             }
 
             string columnName = Enum.GetName(typeof(GradeCategory), category) ?? "Overall";
-            string query = 
-                @$"
-                    SELECT AVG(CAST(r.{columnName} AS FLOAT)) as Value
-                    FROM Departments d
-                    LEFT JOIN Teachers t ON t.DepartmentId = d.Id
-                    LEFT JOIN Reviews r ON r.TeacherId = t.Id
-                    WHERE d.Id = {department.Id}
-                ";
-            double? grade = _dbContext.Database.SqlQuery<double?>(FormattableStringFactory.Create(query)).FirstOrDefault();
+            string sql = $@"
+                SELECT AVG(CAST(r.{columnName} AS FLOAT)) as Value
+                FROM Departments d
+                LEFT JOIN Teachers t ON t.DepartmentId = d.Id
+                LEFT JOIN Reviews r ON r.TeacherId = t.Id
+                WHERE d.Id = @departmentId
+            ";
 
-            grade = grade is not null ? (double)Math.Round((decimal)grade, 2) : null; ;
+            // Parameterize department.Id
+            var grade = _dbContext.Database
+                .SqlQueryRaw<double?>(sql, new SqlParameter("@departmentId", department.Id))
+                .FirstOrDefault();
             return Ok(grade);
         }
 

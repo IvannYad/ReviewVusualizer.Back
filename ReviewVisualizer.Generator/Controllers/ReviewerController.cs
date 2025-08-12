@@ -9,6 +9,7 @@ using Autofac;
 using Microsoft.AspNetCore.Authorization;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.Data.Enums;
+using System.Diagnostics;
 
 namespace ReviewVisualizer.Generator.Controllers
 {
@@ -50,6 +51,12 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpPost()]
         public async Task<IActionResult> CreateAsync([FromBody] ReviewerCreateDTO reviewerDTO)
         {
+            if (!Debugger.IsAttached)
+            {
+                Debugger.Launch();  // Will prompt to select a debugger (Visual Studio, etc.)
+            }
+            Console.WriteLine("Debugger is attached: " + Debugger.IsAttached);
+
             if (!(await IsUserAuthorizedForModificationAsync(reviewerDTO.Type)))
                 return Forbid();
 
@@ -58,6 +65,7 @@ namespace ReviewVisualizer.Generator.Controllers
 
             // Create new reviewer in generator.
             bool success = _generatorHost.CreateReviewer(reviewer);
+            Debugger.Log(1, "Generator", $"Reviewer {reviewerDTO.Type} is created with result: {success}");
 
             if (success)
             {
@@ -72,6 +80,7 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpDelete()]
         public async Task<IActionResult> DeleteAsync([FromQuery] int reviewerId)
         {
+            Debugger.Break();
             var reviewer = await _dbContext.Reviewers.FirstOrDefaultAsync(r => r.Id == reviewerId);
             if (reviewer is null) return Ok();
 
@@ -88,44 +97,16 @@ namespace ReviewVisualizer.Generator.Controllers
             return BadRequest($"Error occurred while deleting reviewer {reviewer.Name}");
         }
 
-        [HttpPost("generate-fire-and-forget")]
-        public async Task<IActionResult> GenerateFireAndForgetAsync([FromQuery]int reviewerId)
+        [HttpPost("generate-review")]
+        public async Task<IActionResult> Generate([FromBody] GenerateReviewRequest request)
         {
-            if (!(await IsUserAuthorizedForModificationAsync(GeneratorType.FIRE_AND_FORGET)))
+            if (!(await IsUserAuthorizedForModificationAsync(request.Type)))
                 return Forbid();
 
-            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
+            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == request.ReviewerId);
             if (reviewer is null) return NotFound();
 
-            _generatorHost.GenerateFireAndForget(reviewer.Id);
-
-            return Ok();
-        }
-
-        [HttpPost("generate-delayed")]
-        public async Task<IActionResult> GenerateDelayedAsync([FromQuery] int reviewerId, [FromQuery] TimeSpan delay)
-        {
-            if (!(await IsUserAuthorizedForModificationAsync(GeneratorType.DELAYED)))
-                return Forbid();
-
-            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
-            if (reviewer is null) return NotFound();
-
-            _generatorHost.GenerateDelayed(reviewer.Id, delay);
-            
-            return Ok();
-        }
-
-        [HttpPost("generate-recurring")]
-        public async Task<IActionResult> GenerateRecurringAsync([FromQuery] int reviewerId, [FromQuery] string cron)
-        {
-            if (!(await IsUserAuthorizedForModificationAsync(GeneratorType.RECURRING)))
-                return Forbid();
-
-            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == reviewerId);
-            if (reviewer is null) return NotFound();
-
-            _generatorHost.GenerateRecurring(reviewer.Id, cron);
+            _generatorHost.GenerateReview(request);
 
             return Ok();
         }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using ReviewVisualizer.Data.Validation;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace ReviewVisualizer.Data.Models
@@ -9,6 +10,7 @@ namespace ReviewVisualizer.Data.Models
         public int Id { get; set; }
 
         [Required]
+        [ValidDepartmentName]
         public string Name { get; set; }
 
         [Required]

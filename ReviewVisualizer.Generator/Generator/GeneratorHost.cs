@@ -3,6 +3,8 @@ using AutoMapper;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.Data;
+using ReviewVisualizer.Data.Dto;
+using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
 
 namespace ReviewVisualizer.Generator.Generator
@@ -88,6 +90,24 @@ namespace ReviewVisualizer.Generator.Generator
                 var reviewerLogger = scope.Resolve<ILogger<Reviewer>>();
                 reviewer.GenerateReview(reviewerLogger, _mapper, _dbContext);
                 _logger.LogInformation($"Review generation job is scheduled from reviewer {reviewer.Name}");
+            }
+        }
+
+        public void GenerateReview(GenerateReviewRequest request)
+        {
+            switch (request.Type)
+            {
+                case GeneratorType.FIRE_AND_FORGET:
+                    GenerateFireAndForget(request.ReviewerId);
+                    break;
+                case GeneratorType.DELAYED:
+                    GenerateDelayed(request.ReviewerId, request.Delay!.Value);
+                    break;
+                case GeneratorType.RECURRING:
+                    GenerateRecurring(request.ReviewerId, request.Cron!);
+                    break;
+                default:
+                    throw new InvalidOperationException(nameof(request.Type));
             }
         }
     }

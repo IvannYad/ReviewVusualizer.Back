@@ -16,14 +16,15 @@ using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Logging services.
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
     .MinimumLevel.Override("System", LogEventLevel.Error)
     .ReadFrom.Configuration(builder.Configuration) // Read config from appsettings.json
     .CreateLogger();
-
 builder.Host.UseSerilog();
+
+// Add Autofac.
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
 // Register Autofac-specific container.
@@ -56,10 +57,12 @@ builder.Services.AddControllers().AddJsonOptions(ops =>
 {
     ops.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
-
 builder.Services.AddEndpointsApiExplorer();
+
+// Swagger service.
 builder.Services.AddSwaggerGen();
 
+// Security services.
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(policy =>
@@ -71,11 +74,9 @@ builder.Services.AddCors(opt =>
             .AllowCredentials();
     });
 });
-
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
     .SetApplicationName("ReviewerVisualizer");
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -94,32 +95,49 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             return Task.CompletedTask;
         };
     });
-
 builder.Services.AddAuthorizationPolicies()
     .AddAuthorizationHandlers();
 
+// Backgroung jobs processing services.
 builder.Services.AddHangfireServices(builder.Configuration);
+
+// Problem details for beautiful responces to user.
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = (ctx) => builder.Environment.IsDevelopment();
+});
 
 var app = builder.Build();
 
+// Global exception handling.
+if (app.Environment.IsDevelopment())
+    app.UseDeveloperExceptionPage();
+else
+    app.UseExceptionHandler();
+app.UseStatusCodePages();
+
+
+// Security middlewares.
 app.UseHttpsRedirection();
 app.UseCors();
-
 app.UseCookiePolicy(new CookiePolicyOptions()
 {
     MinimumSameSitePolicy = SameSiteMode.Strict,
     HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
     Secure = CookieSecurePolicy.Always,
 });
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 app.UseHangfireDashboard(options: new DashboardOptions
 {
     DashboardTitle = "Reviews processing dashboard"
 });
 app.MapHangfireDashboard();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.Run();

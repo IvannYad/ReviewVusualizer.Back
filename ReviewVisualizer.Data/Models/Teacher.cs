@@ -4,6 +4,7 @@ using ReviewVisualizer.Data.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Newtonsoft.Json;
+using System.Xml.Serialization;
 
 namespace ReviewVisualizer.Data.Models
 {
@@ -38,6 +39,7 @@ namespace ReviewVisualizer.Data.Models
 
         [ValidateNever]
         [JsonIgnore]
+        [XmlIgnore]
         public virtual ICollection<Reviewer> Reviewers { get; set; }
     }
 }
