@@ -13,6 +13,7 @@ using AutoMapper;
 using ReviewVisualizer.AuthLibrary.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using Autofac.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,8 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.RegisterGeneric(typeof(Logger<>))
                     .As(typeof(ILogger<>))
                     .SingleInstance();
+
+    containerBuilder.RegisterType<HangfireProxy>().As<IHangfireProxy>();
 });
 
 

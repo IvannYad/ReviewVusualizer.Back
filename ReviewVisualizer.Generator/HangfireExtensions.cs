@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using ReviewVisualizer.Generator.Generator;
 
 namespace ReviewVisualizer.Generator
 {
