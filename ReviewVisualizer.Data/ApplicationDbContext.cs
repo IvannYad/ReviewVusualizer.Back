@@ -21,13 +21,13 @@ namespace ReviewVisualizer.Data
             
         }
 
-        public DbSet<Department> Departments { get; set; }
-        public DbSet<Teacher> Teachers { get; set; }
-        public DbSet<Review> Reviews { get; set; }
-        public DbSet<Reviewer> Reviewers { get; set; }
-        public DbSet<Analyst> Analysts { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserClaim> UserClaims { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<Teacher> Teachers { get; set; }
+        public virtual DbSet<Review> Reviews { get; set; }
+        public virtual DbSet<Reviewer> Reviewers { get; set; }
+        public virtual DbSet<Analyst> Analysts { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserClaim> UserClaims { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

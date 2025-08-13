@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewVisualizer.Data", "Re
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewVisualizer.Generator", "ReviewVisualizer.Generator\ReviewVisualizer.Generator.csproj", "{1B7DDF42-9F48-4DA4-97FE-B8CC81DFC8A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewVisualizer.AuthLibrary", "ReviewVisualizer.AuthLibrary\ReviewVisualizer.AuthLibrary.csproj", "{581BB282-BF15-482E-A144-4B227F6DFFC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReviewVisualizer.AuthLibrary", "ReviewVisualizer.AuthLibrary\ReviewVisualizer.AuthLibrary.csproj", "{581BB282-BF15-482E-A144-4B227F6DFFC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewVisualizer.Generator.Tests", "ReviewVisualizer.Generator.Tests\ReviewVisualizer.Generator.Tests.csproj", "{E61FBDE3-0BA6-4FC9-A330-07FDE99EB6AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{581BB282-BF15-482E-A144-4B227F6DFFC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{581BB282-BF15-482E-A144-4B227F6DFFC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{581BB282-BF15-482E-A144-4B227F6DFFC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E61FBDE3-0BA6-4FC9-A330-07FDE99EB6AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E61FBDE3-0BA6-4FC9-A330-07FDE99EB6AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E61FBDE3-0BA6-4FC9-A330-07FDE99EB6AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E61FBDE3-0BA6-4FC9-A330-07FDE99EB6AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

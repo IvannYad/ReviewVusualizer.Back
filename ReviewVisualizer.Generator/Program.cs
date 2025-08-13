@@ -39,7 +39,6 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     }).AsSelf();
 
     // Register custom services.
-    containerBuilder.RegisterType<QueueController>().As<IQueueController>().SingleInstance();
     containerBuilder.RegisterType<GeneratorHost>().As<IGeneratorHost>();
 
     // Register AutoMapper.

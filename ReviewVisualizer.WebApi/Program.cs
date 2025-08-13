@@ -56,7 +56,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 if (builder.Environment.IsDevelopment())
     builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddSingleton<IQueueController, QueueController>();
 builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>();
 builder.Services.AddSingleton<IProcessorHost, ProcessorHost>();
 builder.Services.AddAutoMapper(typeof(MyMapper));

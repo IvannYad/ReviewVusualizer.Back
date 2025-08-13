@@ -13,7 +13,7 @@ namespace ReviewVisualizer.Generator.Generator
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<GeneratorHost> _logger;
-        private readonly List<Reviewer> _reviewers;
+        protected readonly List<Reviewer> _reviewers;
         private readonly ILifetimeScope _container;
         private readonly IMapper _mapper;
         private static object _locker = new object();

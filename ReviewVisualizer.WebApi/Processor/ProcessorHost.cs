@@ -11,13 +11,11 @@ namespace ReviewVisualizer.WebApi.Processor
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<ProcessorHost> _logger;
         private readonly ILogger<Analyst> _analystLogger;
-        private readonly IQueueController _queue;
         private readonly List<Analyst> _reviewers;
         private readonly Dictionary<Analyst, Thread?> _analystCollection;
         private bool _isInitialized = false;
 
         public ProcessorHost([FromServices] ApplicationDbContext dbContext,
-            [FromServices] IQueueController queue,
             [FromServices] ILogger<ProcessorHost> logger,
             [FromServices] ILogger<Analyst> analystLogger)
         {
@@ -111,9 +109,9 @@ namespace ReviewVisualizer.WebApi.Processor
 
             _logger.LogInformation($"[GeneratorHost] Starting reviewer {analyst.Name}");
 
-            analyst.IsStopped = false;
-            _analystCollection[analyst] = new Thread(() => analyst.ProcessReview(ApplicationDbContext.CreateNew(_dbContext), _queue, _analystLogger));
-            _analystCollection[analyst]?.Start();
+            //analyst.IsStopped = false;
+            //_analystCollection[analyst] = new Thread(() => analyst.ProcessReview(ApplicationDbContext.CreateNew(_dbContext), _queue, _analystLogger));
+            //_analystCollection[analyst]?.Start();
             return true;
         }
 

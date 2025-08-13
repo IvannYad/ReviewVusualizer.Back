@@ -28,14 +28,13 @@ namespace ReviewVisualizer.Data.Models
         }
 
         public void ProcessReview(ApplicationDbContext dbContext,
-            IQueueController queue, 
             ILogger<Analyst> logger)
         {
             try
             {
                 while (!IsStopped)
                 {
-                    var review = queue.GetReview();
+                    var review = new Review();
                     if (review is not null)
                     {
                         if (!dbContext.Teachers.Any(t => t.Id == review.TeacherId))
