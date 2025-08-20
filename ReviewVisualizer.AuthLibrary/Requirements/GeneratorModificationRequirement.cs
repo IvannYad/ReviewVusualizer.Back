@@ -22,21 +22,28 @@ namespace ReviewVisualizer.AuthLibrary.Requirements
             var generatorClaim = context.User.FindFirst(ClaimTypes.GeneratorModifications.GetClaimType())?.Value;
             var roleClaim = context.User.FindFirst(ClaimTypes.SystemRole.GetClaimType())?.Value;
 
-            if (Enum.TryParse(generatorClaim, out GeneratorModifications userLevel))
+            if (!Enum.TryParse(roleClaim, out SystemRoles role))
             {
-                if (userLevel.HasFlag(requirement.RequiredLevel))
-                {
-                    context.Succeed(requirement);
-                } else
-                {
-                    if (Enum.TryParse(roleClaim, out SystemRoles role))
-                    {
-                        if (role.HasFlag(SystemRoles.Owner))
-                        {
-                            context.Succeed(requirement);
-                        }
-                    }
-                }
+                context.Fail();
+                return Task.CompletedTask;
+            }
+
+            if (role.HasFlag(SystemRoles.Owner))
+            {
+                context.Succeed(requirement);
+                return Task.CompletedTask;
+            }
+
+            if (!role.HasFlag(SystemRoles.GeneratorAdmin))
+            {
+                context.Fail();
+                return Task.CompletedTask;
+            }
+
+            if (Enum.TryParse(generatorClaim, out GeneratorModifications userLevel) &&
+                userLevel.HasFlag(requirement.RequiredLevel))
+            {
+                context.Succeed(requirement);
             }
 
             return Task.CompletedTask;

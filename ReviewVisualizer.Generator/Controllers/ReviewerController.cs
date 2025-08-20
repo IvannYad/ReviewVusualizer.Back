@@ -41,9 +41,34 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpGet()]
         public IActionResult GetAll()
         {
-            using var scope = _container.BeginLifetimeScope();
-            var dbContext = scope.Resolve<ApplicationDbContext>();
-            var reviewers = dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
+            var reviewers = _dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
+            return Ok(reviewers);
+        }
+
+        [HttpGet("{id:int}")]
+        public IActionResult Get(int id)
+        {
+            var reviewer = _dbContext.Reviewers
+                .AsNoTracking()
+                .Include(r => r.Teachers)
+                .FirstOrDefault(r => r.Id == id);
+
+            if (reviewer is null)
+                return NotFound();
+
+            return Ok(reviewer);
+        }
+
+        [HttpGet("type/{type:generatorType}")]
+        public IActionResult GetByGeneratorType([FromRoute] GeneratorType type)
+        {
+            var reviewers = _dbContext.Reviewers
+                .AsNoTracking()
+                .Include(r => r.Teachers)
+                .Where(r => r.Type == type);
+
+            if (!reviewers.Any())
+                return NotFound();
 
             return Ok(reviewers);
         }
@@ -51,11 +76,11 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpPost()]
         public async Task<IActionResult> CreateAsync([FromBody] ReviewerCreateDTO reviewerDTO)
         {
-            if (!Debugger.IsAttached)
-            {
-                Debugger.Launch();  // Will prompt to select a debugger (Visual Studio, etc.)
-            }
-            Console.WriteLine("Debugger is attached: " + Debugger.IsAttached);
+            //if (!Debugger.IsAttached)
+            //{
+            //    Debugger.Launch();  // Will prompt to select a debugger (Visual Studio, etc.)
+            //}
+            //Console.WriteLine("Debugger is attached: " + Debugger.IsAttached);
 
             if (!(await IsUserAuthorizedForModificationAsync(reviewerDTO.Type)))
                 return Forbid();
@@ -65,7 +90,7 @@ namespace ReviewVisualizer.Generator.Controllers
 
             // Create new reviewer in generator.
             bool success = _generatorHost.CreateReviewer(reviewer);
-            Debugger.Log(1, "Generator", $"Reviewer {reviewerDTO.Type} is created with result: {success}");
+            //Debugger.Log(1, "Generator", $"Reviewer {reviewerDTO.Type} is created with result: {success}");
 
             if (success)
             {
@@ -74,13 +99,13 @@ namespace ReviewVisualizer.Generator.Controllers
                 _dbContext.SaveChanges();
             }
             
-            return Ok(success);
+            return Ok(success ? reviewer : null);
         }
 
         [HttpDelete()]
         public async Task<IActionResult> DeleteAsync([FromQuery] int reviewerId)
         {
-            Debugger.Break();
+            //Debugger.Break();
             var reviewer = await _dbContext.Reviewers.FirstOrDefaultAsync(r => r.Id == reviewerId);
             if (reviewer is null) return Ok();
 
