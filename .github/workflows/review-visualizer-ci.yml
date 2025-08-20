@@ -1,0 +1,25 @@
+name: Review Visualizer Continious Integration
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project-path: ['./ReviewerVisualizer.Generator/ReviewerVisualizer.Generator','./ReviewerVisualizer.WebApi/ReviewerVisualizer.WebApi.csproj']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 📦
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install dependencies 📂
+        run: dotnet restore ${{ matrix.project-path }}
+
+      - name: Build 🧱
+        run: dotnet build ${{ matrix.project-path }} --configuration Release --no-restore
