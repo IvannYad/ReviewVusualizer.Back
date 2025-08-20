@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project-path: ['./ReviewerVisualizer.Generator/ReviewerVisualizer.Generator','./ReviewerVisualizer.WebApi/ReviewerVisualizer.WebApi.csproj']
+        project-path: ['ReviewVisualizer.WebApi.Generator/ReviewVisualizer.WebApi.Generator.csproj','ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.WebApi.csproj']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
