@@ -122,14 +122,6 @@ jobs:
           os: ${{ env.OS }}
           project-path: $TEST_PROJECT_PATH
       
-      - name: Check connectivity
-        run: |
-          echo -n | telnet 0.0.0.0 1433
-      - name: Debug connection string length
-        run: |
-          echo "Length of CONNECTION_STRING: ${#CONNECTION_STRING}"
-        shell: bash
-
       - name: Install dotnet-ef
         run: dotnet tool install --global dotnet-ef
       

@@ -252,6 +252,8 @@ namespace ReviewVisualizer.Generator.IntegrationTests
             var deleteResponse = await generatorClient
                 .DeleteAsync($"{ReviewerControllerBaseAddress}?reviewerId={reviewerId}");
             _output.WriteLine($"deleteResponse: {await response.Content.ReadAsStringAsync()}");
+            _output.WriteLine($"deleteResponse StatusCode: {response.StatusCode}");
+            _output.WriteLine($"deleteResponse StatusCode: {response.RequestMessage.ToString()}");
             var getReviewerResponse = await generatorClient
                 .GetAsync($"{ReviewerControllerBaseAddress}/{reviewerId}");
 
