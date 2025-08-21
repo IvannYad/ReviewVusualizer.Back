@@ -73,8 +73,9 @@ jobs:
         run: |
           dotnet test $TEST_PROJECT_PATH \
             --configuration Release \
+            -configuration Release \
             --logger "trx;LogFileName=GeneratorTestsLog.trx" \
-            /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+            --collect:"XPlat Code Coverage"
       
       - name: Upload Unit Test Report on Failure
         if: failure() && steps.testing-step.outcome == 'failure'
@@ -83,12 +84,20 @@ jobs:
           name: unit-test-report
           path: ReviewVisualizer.Generator.Tests/TestResults/unit-test-results.trx
       
-      - name: Upload Coverage Report Always
+      - name: Install ReportGenerator
+        if: always()
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+      
+      - name: Generate user-friendly coverage report
+        if: succes()
+        run: reportgenerator -reports:"ReviewVisualizer.Generator.Tests\TestResults\*\coverage.cobertura.xml" -targetdir:"coveragereport"  -reporttypes:Html
+      
+      - name: Upload Html Coverage Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: ReviewVisualizer.Generator.Tests/coverage.cobertura.xml
+          path: coveragereport
 
   prepare-env-for-integration-testing:
     needs: unit-test
