@@ -9,10 +9,6 @@ jobs:
       matrix:
         project: ['Generator','WebApi']
     runs-on: ubuntu_latest
-    outputs:
-      os: ${{ steps.set-output.outputs.os }}
-      project: ${{ steps.set-output.outputs.project }}
-      project_path: ${{ steps.set-output.outputs.project-path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,7 +30,6 @@ jobs:
       - name: Set output data
         id: set-output
         run: |
-          echo "os=${{ matrix.os }} >> $GITHUB_OUTPUT"
           echo "project=${{ matrix.project }} >> $GITHUB_OUTPUT"
           echo "project-path=$PROJECT_PATH" >> $GITHUB_OUTPUT
 
@@ -64,21 +59,21 @@ jobs:
 
   prepare-env-for-integration-testing:
     needs: [unit-test]
-    runs-on: ${{ needs.build.outputs.os }}
+    runs-on: ubuntu_latest
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
         run: echo "Preparing test env for ${{ needs.build.outputs.project }}"
 
   integartion-test:
     needs: [prepare-env-for-integration-testing]
-    runs-on: ${{ needs.build.outputs.os }}
+    runs-on: ubuntu_latest
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
         run: echo "Executing integration tests for ${{ needs.build.outputs.project }}"
 
   publish:
     needs: [integartion-test]
-    runs-on: ${{ needs.build.outputs.os }}
+    runs-on: ubuntu_latest
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
         run: echo "Publishing ${{ needs.build.outputs.project }}"
