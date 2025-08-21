@@ -170,4 +170,10 @@ jobs:
           project-path: $PROJECT_PATH
 
       - name: Publish 📂
-        run: dotnet build $PROJECT_PATH --configuration Release --no-restore
+        run: dotnet build $PROJECT_PATH --configuration Release --no-restore --output $PUBLISH_PATH
+
+      - name: Upload publish artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ toLower(matrix.project)-publish-artifacts }}
+          path: $PUBLISH_PATH

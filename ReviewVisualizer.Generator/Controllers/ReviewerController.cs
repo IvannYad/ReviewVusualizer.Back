@@ -17,14 +17,13 @@ namespace ReviewVisualizer.Generator.Controllers
     [Authorize(Policy = Policies.RequireGeneratorAdmin)]
     public class ReviewerController : ControllerBase
     {
-        private static object _lock = new object();
         private readonly ILogger<ReviewerController> _logger;
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IGeneratorHost _generatorHost;
         private readonly ILifetimeScope _container;
         private readonly IAuthorizationService _authorizationService;
-        
+
         public ReviewerController(ILifetimeScope container, IAuthorizationService authorizationService)
         {
             _container = container;
@@ -109,7 +108,6 @@ namespace ReviewVisualizer.Generator.Controllers
             var reviewer = await _dbContext.Reviewers.FirstOrDefaultAsync(r => r.Id == reviewerId);
             if (reviewer is null) return Ok();
 
-            Console.WriteLine($"reviewer: {reviewer.Name}");
             if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type)))
                 return Forbid();
 
