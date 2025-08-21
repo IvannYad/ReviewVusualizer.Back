@@ -148,7 +148,7 @@ jobs:
         env:
           ConnectionStrings__DefaultConnection: "${{ env.CONNECTION_STRING }}"
       
-      - name: Upload unit test report on tests failure
+      - name: Upload integration test report on tests failure
         if: failure() && steps.testing-step.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
