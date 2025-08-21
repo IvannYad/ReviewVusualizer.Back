@@ -213,10 +213,10 @@ jobs:
           args: >
             --failOnCVSS 7
             --enableRetired
-            --nvdApiWait 0
           data-directory: ~/.dependency-check
 
       - name: Upload HTML report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
