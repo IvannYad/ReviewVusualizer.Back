@@ -148,6 +148,7 @@ jobs:
         env:
           ConnectionStrings__DefaultConnection: "${{ env.CONNECTION_STRING }}"
       - name: test
+        if: failure()
         run: ls
       - name: Upload unit test report on tests failure
         if: failure() && steps.testing-step.outcome == 'failure'
