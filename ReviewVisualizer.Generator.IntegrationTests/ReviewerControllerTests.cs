@@ -36,8 +36,8 @@ namespace ReviewVisualizer.Generator.IntegrationTests
             var response = await generatorClient.GetAsync(ReviewerControllerBaseAddress);
 
             // Assert.
-            //response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            //response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         }
 
