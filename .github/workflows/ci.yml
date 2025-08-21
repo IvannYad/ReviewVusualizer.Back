@@ -147,7 +147,8 @@ jobs:
             --logger:"html;LogFileName=IntegrationTests.html" \
         env:
           ConnectionStrings__DefaultConnection: "${{ env.CONNECTION_STRING }}"
-
+      - name: test
+        run: ls
       - name: Upload unit test report on tests failure
         if: failure() && steps.testing-step.outcome == 'failure'
         uses: actions/upload-artifact@v4
