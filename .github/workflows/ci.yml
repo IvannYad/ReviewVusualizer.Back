@@ -140,12 +140,13 @@ jobs:
           --connection "$CONNECTION_STRING"
       
       - name: Run integration tests
+        id: testing-step
         run: |
           dotnet test $INTEGRATION_TESTS_PROJECT_PATH \
             --configuration Release \
             --logger:"html;LogFileName=IntegrationTests.html" \
         env:
-          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=IntegrationTestDb;User ID=sa;Password=${{ secrets.TEST_DB_PASSWORD }};TrustServerCertificate=True;"
+          ConnectionStrings__DefaultConnection: "${{ env.CONNECTION_STRING }}"
 
       - name: Upload unit test report on tests failure
         if: failure() && steps.testing-step.outcome == 'failure'
