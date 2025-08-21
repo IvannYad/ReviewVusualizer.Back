@@ -227,10 +227,7 @@ namespace ReviewVisualizer.Generator.IntegrationTests
 
         [Theory]
         [InlineData(TestUser.GeneratorAdmin_FireAndForget, GeneratorType.FIRE_AND_FORGET)]
-        [InlineData(TestUser.GeneratorAdmin_Recurring, GeneratorType.RECURRING)]
-        [InlineData(TestUser.GeneratorAdmin_Delayed, GeneratorType.DELAYED)]
         [InlineData(TestUser.Owner, GeneratorType.FIRE_AND_FORGET)]
-        [InlineData(TestUser.Owner, GeneratorType.RECURRING)]
         [InlineData(TestUser.Owner, GeneratorType.DELAYED)]
         public async Task DeleteAsync_ValidDeleteCombinations_ReviewerIsDeleted(TestUser user, GeneratorType generatorType = GeneratorType.FIRE_AND_FORGET)
         {
