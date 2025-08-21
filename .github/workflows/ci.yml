@@ -89,7 +89,7 @@ jobs:
       
       - name: Generate user-friendly coverage report
         if: success()
-        run: reportgenerator -reports:"ReviewVisualizer.Generator.Tests\TestResults\*\coverage.cobertura.xml" -targetdir:"coveragereport"  -reporttypes:Html
+        run: reportgenerator -reports:"ReviewVisualizer.Generator.Tests/TestResults/*/coverage.cobertura.xml" -targetdir:"coveragereport"  -reporttypes:Html
       
       - name: Upload Html Coverage Report
         if: success()
