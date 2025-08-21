@@ -5,6 +5,7 @@ on:
       - main
 env:
   OS: ubuntu-latest
+  TEST_DB_PASSWORD: Pass%word123!
 jobs:
   lint:
     strategy:
@@ -98,19 +99,69 @@ jobs:
           name: coverage-report
           path: coveragereport
 
-  prepare-env-for-integration-testing:
+  integartion-test:
     needs: unit-test
     runs-on: ubuntu-latest
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+          - 1433:1433
+        env:
+          SA_PASSWORD: ${{ env.TEST_DB_PASSWORD }}
+          ACCEPT_EULA: "Y"
+        options: >-
+          --health-cmd "exit 0"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
-      - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
-        run: echo "Preparing test env for ${{ needs.build.outputs.project }}"
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  integartion-test:
-    needs: prepare-env-for-integration-testing
-    runs-on: ubuntu-latest
-    steps:
-      - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
-        run: echo "Executing integration tests for ${{ needs.build.outputs.project }}"
+      - name: Set env variables
+        run: |
+          echo "DATA_PROJECT_PATH=ReviewVisualizer.Data/ReviewVisualizer.Data.csproj" >> $GITHUB_ENV
+          echo "STARTUP_PROJECT_PATH=ReviewVisualizer.Generator/ReviewVisualizer.Generator.csproj" >> $GITHUB_ENV
+          echo "INTEGRATION_TESTS_PROJECT_PATH=ReviewVisualizer.Generator.IntegrationTests/ReviewVisualizer.Generator.IntegrationTests.csproj" >> $GITHUB_ENV
+          echo "CONNECTION_STRING=Server=localhost,1433;Database=IntegrationTestDb;User Id=sa;Password=${{ env.TEST_DB_PASSWORD }}" >> $GITHUB_ENV
+          
+      - name: Prepare environment
+        uses: ./.github/workflows/actions/prepare-net-env
+        with:
+          os: ${{ env.OS }}
+          project_path: $TEST_PROJECT_PATH
+      
+      - name: Wait for SQL Server
+        run: |
+          until /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${{ env.TEST_DB_PASSWORD }} -Q "SELECT 1" > /dev/null 2>&1; do
+            echo "Waiting for SQL Server..."
+            sleep 5
+          done
+      
+      - name: Install dotnet-ef
+        run: dotnet tool install --global dotnet-ef
+      
+      - name: Apply EF Core migrations
+        run: |
+          dotnet ef database update --project $DATA_PROJECT_PATH \
+          --startup-project $STARTUP_PROJECT_PATH \
+          --connection $CONNECTION_STRING
+      
+      - name: Run integration tests
+        run: |
+          dotnet test $INTEGRATION_TESTS_PROJECT_PATH \
+            --configuration Release \
+            --logger "trx;LogFileName=IntegrationTestsLog.trx"
+        env:
+          ConnectionStrings__Default: $CONNECTION_STRING
+
+      - name: Upload unit test report on tests failure
+        if: failure() && steps.testing-step.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: ReviewVisualizer.Generator.IntegartionTests/TestResults/IntegrationTestsLog.trx
 
   publish:
     needs: integartion-test
