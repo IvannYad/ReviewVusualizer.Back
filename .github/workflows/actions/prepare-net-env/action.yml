@@ -18,14 +18,10 @@ runs:
         
     - name: Install dependencies 📂 (Windows)
       if: ${{ inputs.os == 'windows-latest' }}
-      env:
-        PROJECT_PATH: ${{ inputs.project-path }}
-      run: dotnet restore $PROJECT_PATH
+      run: dotnet restore ${{ inputs.project-path }}
       shell: pwsh
 
     - name: Install dependencies 📂 (Linux/Mac)
       if: ${{ inputs.os != 'windows-latest' }}
-      env:
-        PROJECT_PATH: ${{ inputs.project-path }}
-      run: dotnet restore $PROJECT_PATH
+      run: dotnet restore ${{ inputs.project-path }}
       shell: bash
