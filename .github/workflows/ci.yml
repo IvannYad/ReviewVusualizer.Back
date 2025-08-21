@@ -149,7 +149,6 @@ jobs:
           path: ReviewVisualizer.Generator.IntegrationTests/TestResults/IntegrationTests.html
 
   publish:
-    needs: integartion-test
     strategy:
       matrix:
         project: ['Generator','WebApi']
@@ -171,6 +170,9 @@ jobs:
 
       - name: Publish 📂
         run: dotnet publish $PROJECT_PATH --configuration Release --no-restore --output $PUBLISH_PATH
+
+      - name: LS
+        run: ls -R
 
       - name: Upload publish artifacts
         uses: actions/upload-artifact@v4
