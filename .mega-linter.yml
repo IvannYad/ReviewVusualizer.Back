@@ -1,0 +1,12 @@
+linters:
+  csharp:
+    enabled: true
+    rules:
+      stylecop:
+        enabled: true
+        ruleSet: Microsoft
+      roslyn:
+        enabled: true
+reporter:
+  html: true
+  github-pr-check: true

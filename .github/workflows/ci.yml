@@ -148,6 +148,36 @@ jobs:
           name: unit-test-report
           path: ReviewVisualizer.Generator.IntegrationTests/TestResults/IntegrationTests.html
 
+  megalinter-code-quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET 📦
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      # Needed for MegaLinter
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install MegaLinter
+        run: npm install -g megalinter
+
+      - name: Run MegaLinter
+        run: |
+          megalinter run --ci --reporter=github-pr-check
+
+      - name: Upload MegaLinter HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-quality-report
+          path: reports/html-report/
+
   publish:
     strategy:
       matrix:
