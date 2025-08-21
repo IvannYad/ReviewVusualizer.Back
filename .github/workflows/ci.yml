@@ -5,7 +5,7 @@ on:
       - main
 env:
   OS: ubuntu-latest
-  TEST_DB_PASSWORD: Pass%word123!
+  TEST_DB_PASSWORD: Password123!
 jobs:
   lint:
     runs-on: ubuntu-latest
