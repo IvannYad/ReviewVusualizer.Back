@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+env:
+  PREPARE_ENV_WORKFLOW_PATH: './github/workflows/prepare-net-environment.yml'
 jobs:
   build:
     strategy:
@@ -24,7 +26,7 @@ jobs:
           echo "AZURE_WEBAPP_PACKAGE_PATH=publish.${{ matrix.project }}" >> $GITHUB_ENV
       
       - name: Prepare environment
-        uses: './github/workflows/'
+        uses: ${{ env.PREPARE_ENV_WORKFLOW_PATH }}
         with:
           os: ${{ matrix.os }}
           project_path: $PROJECT_PATH
@@ -48,9 +50,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
       - name: Prepare environment
-        uses: './github/workflows/'
+        uses: ${{ env.PREPARE_ENV_WORKFLOW_PATH }}
         with:
           os: ${{ needs.build.outputs.os }}
           project_path: ${{ needs.build.outputs.project-path }}
