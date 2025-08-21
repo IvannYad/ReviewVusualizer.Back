@@ -88,8 +88,8 @@ namespace ReviewVisualizer.Generator.Tests
             int actualReviewersCount = _generatorHost.GetReviewersCount();
 
             // Assert.
-            //Assert.Equal(initialReviewersCount + 1, actualReviewersCount);
-            Assert.Equal(initialReviewersCount + 2, actualReviewersCount);
+            Assert.Equal(initialReviewersCount + 1, actualReviewersCount);
+            //Assert.Equal(initialReviewersCount + 2, actualReviewersCount);
         }
 
         [Fact]
