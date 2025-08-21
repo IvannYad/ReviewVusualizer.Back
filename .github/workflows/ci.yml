@@ -115,7 +115,7 @@ jobs:
       - name: Set env variables
         run: |
           echo "DATA_PROJECT_PATH=ReviewVisualizer.Data/ReviewVisualizer.Data.csproj" >> $GITHUB_ENV
-          echo "STARTUP_PROJECT_PATH=ReviewVisualizer.Generator/ReviewVisualizer.Generator.csproj" >> $GITHUB_ENV
+          echo "STARTUP_PROJECT_PATH=ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.csproj" >> $GITHUB_ENV
           echo "INTEGRATION_TESTS_PROJECT_PATH=ReviewVisualizer.Generator.IntegrationTests/ReviewVisualizer.Generator.IntegrationTests.csproj" >> $GITHUB_ENV
           echo "CONNECTION_STRING=Server=localhost,1433;Database=IntegrationTestDb;User Id=sa;Password=${{ env.TEST_DB_PASSWORD }}" >> $GITHUB_ENV
           
