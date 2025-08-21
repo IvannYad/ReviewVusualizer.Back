@@ -101,7 +101,7 @@ jobs:
         ports:
           - 1433:1433
         env:
-          SA_PASSWORD: "YourStrong!Passw0rd"
+          SA_PASSWORD: "YourStrongPassw0rd!"
           ACCEPT_EULA: "Y"
     steps:
       - name: Checkout
@@ -112,7 +112,7 @@ jobs:
           echo "DATA_PROJECT_PATH=ReviewVisualizer.Data/ReviewVisualizer.Data.csproj" >> $GITHUB_ENV
           echo "STARTUP_PROJECT_PATH=ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.csproj" >> $GITHUB_ENV
           echo "INTEGRATION_TESTS_PROJECT_PATH=ReviewVisualizer.Generator.IntegrationTests/ReviewVisualizer.Generator.IntegrationTests.csproj" >> $GITHUB_ENV
-          echo "CONNECTION_STRING=Server=mssql,1433;Database=IntegrationTestDb;User Id=sa;Password=YourStrong!Passw0rd;" >> $GITHUB_ENV
+          echo "CONNECTION_STRING=Server=mssql:1433;Database=IntegrationTestDb;User Id=sa;Password=YourStrongPassw0rd!;TrustServerCertificate=True;" >> $GITHUB_ENV
           
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
