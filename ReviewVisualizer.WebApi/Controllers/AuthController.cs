@@ -30,13 +30,13 @@ namespace ReviewVisualizer.WebApi.Controllers
 
             try
             {
-                var principal = await _authService.LoginAsync(loginRequest);
+                var principal = await _authService.LoginAsync(loginRequest).ConfigureAwait(false);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                     new AuthenticationProperties
                     {
                         IsPersistent = true,
                         ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
-                    });
+                    }).ConfigureAwait(false);
 
                 HttpContext.Response.Cookies.Append(
                     "UserName",
@@ -66,7 +66,7 @@ namespace ReviewVisualizer.WebApi.Controllers
 
             try
             {
-                var registerResponse = await _authService.RegisterAsync(registerRequest);
+                var registerResponse = await _authService.RegisterAsync(registerRequest).ConfigureAwait(false);
 
                 return Ok(new RegisterResponse(registerResponse, registerRequest.Username, registerRequest.Password));
             }
@@ -93,7 +93,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                 });
             }
 
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).ConfigureAwait(false);
             return NoContent();
         }
 

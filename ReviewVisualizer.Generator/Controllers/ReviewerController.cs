@@ -81,7 +81,7 @@ namespace ReviewVisualizer.Generator.Controllers
             //}
             //Console.WriteLine("Debugger is attached: " + Debugger.IsAttached);
 
-            if (!(await IsUserAuthorizedForModificationAsync(reviewerDTO.Type)))
+            if (!(await IsUserAuthorizedForModificationAsync(reviewerDTO.Type).ConfigureAwait(false)))
                 return Forbid();
 
             var reviewer = _mapper.Map<Reviewer>(reviewerDTO);
@@ -105,16 +105,16 @@ namespace ReviewVisualizer.Generator.Controllers
         public async Task<IActionResult> DeleteAsync([FromQuery] int reviewerId)
         {
             //Debugger.Break();
-            var reviewer = await _dbContext.Reviewers.FirstOrDefaultAsync(r => r.Id == reviewerId);
+            var reviewer = await _dbContext.Reviewers.FirstOrDefaultAsync(r => r.Id == reviewerId).ConfigureAwait(false);
             if (reviewer is null) return Ok();
 
-            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type)))
+            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type).ConfigureAwait(false)))
                 return Forbid();
 
             if (_generatorHost.DeleteReviewer(reviewer.Id))
             {
                 _dbContext.Reviewers.Remove(reviewer);
-                await _dbContext.SaveChangesAsync();
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
                 return Ok();
             }
 
@@ -124,7 +124,7 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpPost("generate-review")]
         public async Task<IActionResult> Generate([FromBody] GenerateReviewRequest request)
         {
-            if (!(await IsUserAuthorizedForModificationAsync(request.Type)))
+            if (!(await IsUserAuthorizedForModificationAsync(request.Type).ConfigureAwait(false)))
                 return Forbid();
 
             var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == request.ReviewerId);
@@ -141,7 +141,7 @@ namespace ReviewVisualizer.Generator.Controllers
             var reviewer = _dbContext.Reviewers.Include(r => r.Teachers).FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
-            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type)))
+            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type).ConfigureAwait(false)))
                 return Forbid();
 
             if (reviewer.Teachers is null) reviewer.Teachers = new List<Teacher>();
@@ -161,7 +161,7 @@ namespace ReviewVisualizer.Generator.Controllers
             var reviewer = _dbContext.Reviewers.Include(r => r.Teachers).FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null) return NotFound();
 
-            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type)))
+            if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type).ConfigureAwait(false)))
                 return Forbid();
 
             var deletedTeachers = reviewer.Teachers.Where(t => teacherIds.Contains(t.Id)).ToList();
@@ -187,7 +187,7 @@ namespace ReviewVisualizer.Generator.Controllers
                 return false;
 
             // Inject IAuthorizationService into controller via DI
-            var authResult = await _authorizationService.AuthorizeAsync(User, policyName!);
+            var authResult = await _authorizationService.AuthorizeAsync(User, policyName!).ConfigureAwait(false);
 
             return authResult.Succeeded;
         }

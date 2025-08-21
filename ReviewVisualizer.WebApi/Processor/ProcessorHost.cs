@@ -8,10 +8,7 @@ namespace ReviewVisualizer.WebApi.Processor
 {
     public class ProcessorHost : IProcessorHost
     {
-        private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<ProcessorHost> _logger;
-        private readonly ILogger<Analyst> _analystLogger;
-        private readonly List<Analyst> _reviewers;
         private readonly Dictionary<Analyst, Thread?> _analystCollection;
         private bool _isInitialized = false;
 

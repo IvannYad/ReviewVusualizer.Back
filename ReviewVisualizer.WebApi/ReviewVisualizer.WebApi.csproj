@@ -6,8 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>32eefcef-656c-4ea3-bc12-cf10dbec883e</UserSecretsId>
     <NoWarn>CA1416</NoWarn>
-	<AnalysisMode>AllEnabledByDefault</AnalysisMode>
-  </PropertyGroup>
+	</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.10" />
