@@ -154,29 +154,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup .NET 📦
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      
-      # Needed for MegaLinter
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      - name: MegaLinter
+        uses: oxsecurity/megalinter@v8
+        env:
+          VALIDATE_ALL_CODEBASE: >-
+            ${{
+              github.event_name == 'push' &&
+              contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
+            }}
 
-      - name: Install MegaLinter
-        run: npm install -g megalinter
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run MegaLinter
-        run: |
-          megalinter run --ci --reporter=github-pr-check
-
-      - name: Upload MegaLinter HTML report
+      - name: Archive production artifacts
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: code-quality-report
-          path: reports/html-report/
+          name: MegaLinter reports
+          include-hidden-files: "true"
+          path: |
+            megalinter-reports
+            mega-linter.log
 
   publish:
     strategy:
