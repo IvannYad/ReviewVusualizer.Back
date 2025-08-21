@@ -5,7 +5,6 @@ on:
       - main
 env:
   OS: ubuntu-latest
-  TEST_DB_PASSWORD: Password123!
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -104,7 +103,7 @@ jobs:
           SA_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
           ACCEPT_EULA: "Y"
     env:
-      CONNECTION_STRING: "Server=mssql;Port=1433;Database=IntegrationTestDb;User ID=sa;Password=${{ secrets.TEST_DB_PASSWORD }};TrustServerCertificate=True;"
+      CONNECTION_STRING: "Server=localhost,1433;Database=IntegrationTestDb;User ID=sa;Password=${{ secrets.TEST_DB_PASSWORD }};TrustServerCertificate=True;"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
