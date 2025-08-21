@@ -73,11 +73,10 @@ jobs:
         run: |
           dotnet test $TEST_PROJECT_PATH \
             --configuration Release \
-            -configuration Release \
             --logger "trx;LogFileName=GeneratorTestsLog.trx" \
             --collect:"XPlat Code Coverage"
       
-      - name: Upload Unit Test Report on Failure
+      - name: Upload unit test report on tests failure
         if: failure() && steps.testing-step.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
