@@ -140,7 +140,7 @@ jobs:
             --configuration Release \
             --logger:"html;LogFileName=IntegrationTests.html" \
         env:
-          ConnectionStrings__Default: $CONNECTION_STRING
+          ConnectionStrings__DefaultConnection: $CONNECTION_STRING
 
       - name: Upload unit test report on tests failure
         if: failure() && steps.testing-step.outcome == 'failure'
