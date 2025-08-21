@@ -121,6 +121,11 @@ jobs:
           os: ${{ env.OS }}
           project_path: $TEST_PROJECT_PATH
       
+      - name: Debug connection string length
+        run: |
+          echo "Length of CONNECTION_STRING: ${#CONNECTION_STRING}"
+        shell: bash
+        
       - name: Install dotnet-ef
         run: dotnet tool install --global dotnet-ef
       
