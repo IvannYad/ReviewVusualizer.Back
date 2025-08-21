@@ -101,13 +101,8 @@ jobs:
         ports:
           - 1433:1433
         env:
-          SA_PASSWORD: Password1234
+          SA_PASSWORD: "YourStrong!Passw0rd"
           ACCEPT_EULA: "Y"
-        options: >-
-          --health-cmd "exit 0"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -117,7 +112,7 @@ jobs:
           echo "DATA_PROJECT_PATH=ReviewVisualizer.Data/ReviewVisualizer.Data.csproj" >> $GITHUB_ENV
           echo "STARTUP_PROJECT_PATH=ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.csproj" >> $GITHUB_ENV
           echo "INTEGRATION_TESTS_PROJECT_PATH=ReviewVisualizer.Generator.IntegrationTests/ReviewVisualizer.Generator.IntegrationTests.csproj" >> $GITHUB_ENV
-          echo "CONNECTION_STRING=Server=localhost,1433;Database=IntegrationTestDb;User Id=sa;Password=Password1234" >> $GITHUB_ENV
+          echo "CONNECTION_STRING=Server=mssql,1433;Database=IntegrationTestDb;User Id=sa;Password=YourStrong!Passw0rd" >> $GITHUB_ENV
           
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
