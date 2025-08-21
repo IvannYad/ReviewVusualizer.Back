@@ -7,6 +7,7 @@ env:
   OS: ubuntu-latest
 jobs:
   lint:
+    if: failure()
     strategy:
       matrix:
         project: ['Generator','WebApi']
@@ -29,6 +30,7 @@ jobs:
   
   build:
     needs: lint
+    if: failure()
     strategy:
       matrix:
         project: ['Generator','WebApi']
@@ -74,7 +76,6 @@ jobs:
         run: |
           dotnet test $TEST_PROJECT_PATH \
             --configuration Release \
-            --no-build \
             --logger "trx;LogFileName=GeneratorTestsLog.trx" \
             /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
       
