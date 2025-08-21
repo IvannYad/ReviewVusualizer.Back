@@ -21,7 +21,7 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
         with:
-          os: ubuntu_latest
+          os: 'ubuntu_latest'
           project-path: $PROJECT_PATH
 
       - name: Build 🧱
