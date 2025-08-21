@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         project: ['Generator','WebApi']
-    runs-on: ${{ matrix.os }}
+    runs-on: $OS
     outputs:
       os: ${{ steps.set-output.outputs.os }}
       project: ${{ steps.set-output.outputs.project }}
@@ -45,7 +45,7 @@ jobs:
   
   unit-test:
     name: Unit tests (for Generator Project)
-    runs-on: $env.OS
+    runs-on: $OS
     needs: build
     steps:
       - name: Checkout
