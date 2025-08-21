@@ -7,7 +7,6 @@ env:
   OS: ubuntu-latest
 jobs:
   lint:
-    if: failure()
     strategy:
       matrix:
         project: ['Generator','WebApi']
@@ -30,7 +29,6 @@ jobs:
   
   build:
     needs: lint
-    if: failure()
     strategy:
       matrix:
         project: ['Generator','WebApi']
@@ -56,7 +54,6 @@ jobs:
   unit-test:
     name: Unit tests (for Generator Project)
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
