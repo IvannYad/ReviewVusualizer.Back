@@ -25,7 +25,7 @@ namespace ReviewVisualizer.Generator.Generator
             {
                 _container = container;
                 var scope = _container.BeginLifetimeScope();
-                
+
                 _dbContext = scope.Resolve<ApplicationDbContext>();
                 _logger = scope.Resolve<ILogger<GeneratorHost>>();
                 _reviewers = _dbContext.Reviewers.Include(r => r.Teachers).ToList();
@@ -45,7 +45,7 @@ namespace ReviewVisualizer.Generator.Generator
             var reviewer = _reviewers.FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is not null)
             {
-                if(reviewer.Type == GeneratorType.RECURRING)
+                if (reviewer.Type == GeneratorType.RECURRING)
                     _hangfireProxy.RemoveIfExists(reviewerId.ToString());
 
                 return _reviewers.Remove(reviewer);

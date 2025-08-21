@@ -19,7 +19,7 @@ namespace ReviewVisualizer.WebApi.Processor
             [FromServices] ILogger<ProcessorHost> logger,
             [FromServices] ILogger<Analyst> analystLogger)
         {
-            
+
         }
 
         public void Init()

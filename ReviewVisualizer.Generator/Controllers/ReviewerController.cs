@@ -98,7 +98,7 @@ namespace ReviewVisualizer.Generator.Controllers
                 _dbContext.Reviewers.Add(reviewer);
                 _dbContext.SaveChanges();
             }
-            
+
             return Ok(success ? reviewer : null);
         }
 
@@ -118,7 +118,7 @@ namespace ReviewVisualizer.Generator.Controllers
                 _dbContext.SaveChanges();
                 return Ok();
             }
-            
+
             return BadRequest($"Error occurred while deleting reviewer {reviewer.Name}");
         }
 
@@ -145,7 +145,7 @@ namespace ReviewVisualizer.Generator.Controllers
             if (!(await IsUserAuthorizedForModificationAsync(reviewer.Type)))
                 return Forbid();
 
-            if(reviewer.Teachers is null) reviewer.Teachers = new List<Teacher>();
+            if (reviewer.Teachers is null) reviewer.Teachers = new List<Teacher>();
             var newTeachersForReview = teacherIds.Where(id => !reviewer.Teachers.Any(teacher => teacher.Id == id));
             var chosenTeachers = _dbContext.Teachers.Where(t => newTeachersForReview.Contains(t.Id)).ToList();
 

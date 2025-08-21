@@ -29,12 +29,12 @@ namespace ReviewVisualizer.WebApi.Controllers
         {
             var users = _dbContext.Users.Include(u => u.Claims)
                 .Select(u => new
-                    {
-                        u.Id,
-                        u.UserName,
-                        SystemRole = u.Claims.FirstOrDefault(c => c.ClaimType == ClaimTypes.SystemRole.GetClaimType()),
-                        GeneratorModification = u.Claims.FirstOrDefault(c => c.ClaimType == ClaimTypes.GeneratorModifications.GetClaimType()),
-                    })
+                {
+                    u.Id,
+                    u.UserName,
+                    SystemRole = u.Claims.FirstOrDefault(c => c.ClaimType == ClaimTypes.SystemRole.GetClaimType()),
+                    GeneratorModification = u.Claims.FirstOrDefault(c => c.ClaimType == ClaimTypes.GeneratorModifications.GetClaimType()),
+                })
                 .AsEnumerable()
                 .Select(x => new UserDto
                 {

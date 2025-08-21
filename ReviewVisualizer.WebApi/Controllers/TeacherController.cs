@@ -97,7 +97,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                 _dbContext.Teachers.Remove(teacher);
                 _dbContext.SaveChanges();
             }
-            
+
             return Ok();
         }
 
@@ -137,7 +137,7 @@ namespace ReviewVisualizer.WebApi.Controllers
 
         [HttpGet("get-department-rank/{teacherId:int}")]
         [Produces("application/json")]
-        public  IActionResult GetRankInDepartment(int teacherId)
+        public IActionResult GetRankInDepartment(int teacherId)
         {
             var teacher = _dbContext.Teachers.FirstOrDefault(t => t.Id == teacherId);
             if (teacher is null)
