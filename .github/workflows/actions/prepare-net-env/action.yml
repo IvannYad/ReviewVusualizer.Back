@@ -15,18 +15,17 @@ runs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
-        cache: true
-
+        
     - name: Install dependencies 📂 (Windows)
       if: ${{ inputs.os == 'windows-latest' }}
       env:
         PROJECT_PATH: ${{ inputs.project-path }}
-      run: dotnet restore $PROJECT_PATH --use-lock-file
+      run: dotnet restore $PROJECT_PATH
       shell: pwsh
 
     - name: Install dependencies 📂 (Linux/Mac)
       if: ${{ inputs.os != 'windows-latest' }}
       env:
         PROJECT_PATH: ${{ inputs.project-path }}
-      run: dotnet restore $PROJECT_PATH --use-lock-file
+      run: dotnet restore $PROJECT_PATH
       shell: bash
