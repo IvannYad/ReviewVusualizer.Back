@@ -68,22 +68,15 @@ jobs:
         run: |
           dotnet test $TEST_PROJECT_PATH \
             --configuration Release \
-            --logger "trx;LogFileName=GeneratorTestsLog.trx" \
+            --logger:"html;LogFileName=UnitTests.html" \
             --collect:"XPlat Code Coverage"
       
-      - name: Convert TRX to HTML
-        if: failure() && steps.testing-step.outcome == 'failure'
-        run: |
-          dotnet tool install -g trx2html
-          mkdir -p TestReports
-          trx2html -i TestResults/GeneratorTestsLog.trx -o TestReports/UnitTests.html
-      
       - name: Upload unit test report on tests failure
-        if: success()
+        if: failure() && steps.testing-step.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-report
-          path: ReviewVisualizer.Generator.Tests/TestReports/UnitTests.html
+          path: ReviewVisualizer.Generator.Tests/TestResults/UnitTests.html
       
       - name: Install ReportGenerator
         if: always()
@@ -145,23 +138,16 @@ jobs:
         run: |
           dotnet test $INTEGRATION_TESTS_PROJECT_PATH \
             --configuration Release \
-            --logger "trx;LogFileName=IntegrationTestsLog.trx"
+            --logger:"html;LogFileName=IntegrationTests.html" \
         env:
           ConnectionStrings__Default: $CONNECTION_STRING
 
-      - name: Convert TRX to HTML
+      - name: Upload unit test report on tests failure
         if: failure() && steps.testing-step.outcome == 'failure'
-        run: |
-          dotnet tool install -g trx2html
-          mkdir -p TestReports
-          trx2html -i TestResults/IntegrationTestsLog.trx -o TestReports/IntegrationTests.html
-
-      - name: Upload integration test report on tests failure
-        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: integration-test-report
-          path: ReviewVisualizer.Generator.IntegartionTests/TestReports/IntegrationTests.html
+          name: unit-test-report
+          path: ReviewVisualizer.Generator.IntegartionTests/TestResults/IntegrationTests.html
 
   publish:
     needs: integartion-test
