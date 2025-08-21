@@ -71,12 +71,19 @@ jobs:
             --logger "trx;LogFileName=GeneratorTestsLog.trx" \
             --collect:"XPlat Code Coverage"
       
-      - name: Upload unit test report on tests failure
+      - name: Convert TRX to HTML
         if: failure() && steps.testing-step.outcome == 'failure'
+        run: |
+          dotnet tool install -g trx2html
+          mkdir -p TestReports
+          trx2html -i TestResults/GeneratorTestsLog.trx -o TestReports/UnitTests.html
+      
+      - name: Upload unit test report on tests failure
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-report
-          path: ReviewVisualizer.Generator.Tests/TestResults/unit-test-results.trx
+          path: ReviewVisualizer.Generator.Tests/TestReports/UnitTests.html
       
       - name: Install ReportGenerator
         if: always()
@@ -142,12 +149,19 @@ jobs:
         env:
           ConnectionStrings__Default: $CONNECTION_STRING
 
-      - name: Upload unit test report on tests failure
+      - name: Convert TRX to HTML
         if: failure() && steps.testing-step.outcome == 'failure'
+        run: |
+          dotnet tool install -g trx2html
+          mkdir -p TestReports
+          trx2html -i TestResults/IntegrationTestsLog.trx -o TestReports/IntegrationTests.html
+
+      - name: Upload integration test report on tests failure
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: unit-test-report
-          path: ReviewVisualizer.Generator.IntegartionTests/TestResults/IntegrationTestsLog.trx
+          name: integration-test-report
+          path: ReviewVisualizer.Generator.IntegartionTests/TestReports/IntegrationTests.html
 
   publish:
     needs: integartion-test
