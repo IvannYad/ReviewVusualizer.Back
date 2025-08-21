@@ -15,10 +15,14 @@ jobs:
       project: ${{ steps.set-output.outputs.project }}
       project_path: ${{ steps.set-output.outputs.project-path }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Set env variables
         run: |
           echo "PROJECT_PATH=ReviewVisualizer.${{ matrix.project }}/ReviewVisualizer.${{ matrix.project }}.csproj" >> $GITHUB_ENV
           echo "AZURE_WEBAPP_PACKAGE_PATH=publish.${{ matrix.project }}" >> $GITHUB_ENV
+      
       - name: Prepare environment
         uses: './github/workflows/'
         with:
@@ -42,6 +46,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
       - name: Prepare environment
         uses: './github/workflows/'
         with:
