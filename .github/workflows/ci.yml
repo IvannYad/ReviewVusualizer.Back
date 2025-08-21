@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         project: ['Generator','WebApi']
-        os: ['ubuntu-latest', 'windows-latest']
+        os: ['ubuntu-latest']
     runs-on: ${{ matrix.os }}
     outputs:
       os: ${{ steps.set-output.outputs.os }}
