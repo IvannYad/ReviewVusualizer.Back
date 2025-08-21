@@ -96,6 +96,7 @@ jobs:
           path: coveragereport
 
   integartion-test:
+    needs: unit-test
     runs-on: ubuntu-latest
     services:
       mssql:
@@ -149,6 +150,7 @@ jobs:
           path: ReviewVisualizer.Generator.IntegrationTests/TestResults/IntegrationTests.html
 
   megalinter-code-quality-check:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -175,6 +177,42 @@ jobs:
           path: |
             megalinter-reports
             mega-linter.log
+
+  code-security-check:
+    runs-on: ubuntu-latest
+    env:
+      PROG_LANG: csharp
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ env.PROG_LANG }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ env.PROG_LANG }}"
+          output: sarif-results
+
+      - name: Install SARIF Tools
+        run: pip install sarif-tools
+
+      - name: Convert SARIF to HTML
+        run: |
+          mkdir reports
+          sarif-html sarif-results/*.sarif -o reports/codeql-report.html
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-html-report
+          path: reports/codeql-report.html
 
   publish:
     strategy:
