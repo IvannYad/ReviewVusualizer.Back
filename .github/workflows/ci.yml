@@ -3,12 +3,13 @@ on:
   push:
     branches:
       - main
+env:
+  OS: ubuntu_latest
 jobs:
   build:
     strategy:
       matrix:
         project: ['Generator','WebApi']
-        os: ['ubuntu-latest']
     runs-on: ${{ matrix.os }}
     outputs:
       os: ${{ steps.set-output.outputs.os }}
@@ -26,7 +27,7 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
         with:
-          os: ${{ matrix.os }}
+          os: ${{ env.OS }}
           project-path: $PROJECT_PATH
 
       - name: Build 🧱
@@ -43,39 +44,42 @@ jobs:
       #   run: dotnet publish WebApi -c Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
   
   unit-test:
-    runs-on: ubuntu-latest
+    name: Unit tests (for Generator Project)
+    runs-on: ${{ env.OS }}
     needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set env variables
+        run: |
+          echo "TEST_PROJECT_PATH=ReviewVisualizer.Generator.Tests/ReviewVisualizer.Generator.Tests.csproj" >> $GITHUB_ENV
+          
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
         with:
-          os: ${{ needs.build.outputs.os }}
-          project_path: ${{ needs.build.outputs.project-path }}
+          os: ${{ env.OS }}
+          project_path: $TEST_PROJECT_PATH
       
       - name: Execute Test unit tests
-        env:
-          TEST_PROJECT: ReviewVisualizer.${{ needs.build.outputs.project }}.Tests/ReviewVisualizer${{ needs.build.outputs.project }}.Tests.csproj
-        run: dotnet test $TEST_PROJECT --configuration Release
+        run: dotnet test $TEST_PROJECT_PATH --configuration Release
 
   prepare-env-for-integration-testing:
-    needs: [unit-test, build]
+    needs: [unit-test]
     runs-on: ${{ needs.build.outputs.os }}
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
         run: echo "Preparing test env for ${{ needs.build.outputs.project }}"
 
   integartion-test:
-    needs: [prepare-env-for-integration-testing, build]
+    needs: [prepare-env-for-integration-testing]
     runs-on: ${{ needs.build.outputs.os }}
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
         run: echo "Executing integration tests for ${{ needs.build.outputs.project }}"
 
   publish:
-    needs: [integartion-test, build]
+    needs: [integartion-test]
     runs-on: ${{ needs.build.outputs.os }}
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
