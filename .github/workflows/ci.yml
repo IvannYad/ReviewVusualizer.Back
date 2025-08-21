@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         project: ['Generator','WebApi']
-    runs-on: $OS
+    runs-on: ${{ env.OS }}
     outputs:
       os: ${{ steps.set-output.outputs.os }}
       project: ${{ steps.set-output.outputs.project }}
@@ -27,7 +27,7 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
         with:
-          os: $OS
+          os: ${{ env.OS }}
           project-path: $PROJECT_PATH
 
       - name: Build 🧱
@@ -45,7 +45,7 @@ jobs:
   
   unit-test:
     name: Unit tests (for Generator Project)
-    runs-on: $OS
+    runs-on: ${{ env.OS }}
     needs: build
     steps:
       - name: Checkout
@@ -58,7 +58,7 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
         with:
-          os: $OS
+          os: ${{ env.OS }}
           project_path: $TEST_PROJECT_PATH
       
       - name: Execute Test unit tests
