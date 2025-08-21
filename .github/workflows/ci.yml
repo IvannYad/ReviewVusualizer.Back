@@ -6,7 +6,29 @@ on:
 env:
   OS: ubuntu-latest
 jobs:
+  lint:
+    strategy:
+      matrix:
+        project: ['Generator','WebApi']
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set env variables
+        run: |
+          echo "PROJECT_PATH=ReviewVisualizer.${{ matrix.project }}/ReviewVisualizer.${{ matrix.project }}.csproj" >> $GITHUB_ENV
+      
+      - name: Prepare environment
+        uses: ./.github/workflows/actions/prepare-net-env
+        with:
+          os: ${{ env.OS }}
+          project-path: $PROJECT_PATH
+
+      - name: Code lint / formatting check
+        run: dotnet format --verify-no-changes
+  
   build:
+    needs: lint
     strategy:
       matrix:
         project: ['Generator','WebApi']
@@ -28,9 +50,6 @@ jobs:
 
       - name: Build 🧱
         run: dotnet build $PROJECT_PATH --configuration Release --no-restore
-
-      # - name: Publish
-      #   run: dotnet publish WebApi -c Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
   
   unit-test:
     name: Unit tests (for Generator Project)
@@ -50,8 +69,28 @@ jobs:
           os: ${{ env.OS }}
           project_path: $TEST_PROJECT_PATH
       
-      - name: Execute Test unit tests
-        run: dotnet test $TEST_PROJECT_PATH --configuration Release
+      - name: Run Unit Tests
+        id: testing-step
+        run: |
+          dotnet test $TEST_PROJECT_PATH \
+            --configuration Release \
+            --no-build \
+            --logger "trx;LogFileName=GeneratorTestsLog.trx" \
+            /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+      
+      - name: Upload Unit Test Report on Failure
+        if: failure() && steps.testing-step.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: ReviewVisualizer.Generator.Tests/TestResults/unit-test-results.trx
+      
+      - name: Upload Coverage Report Always
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ReviewVisualizer.Generator.Tests/coverage.cobertura.xml
 
   prepare-env-for-integration-testing:
     needs: unit-test
@@ -69,7 +108,24 @@ jobs:
 
   publish:
     needs: integartion-test
+    strategy:
+      matrix:
+        project: ['Generator','WebApi']
     runs-on: ubuntu-latest
     steps:
-      - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
-        run: echo "Publishing ${{ needs.build.outputs.project }}"
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set env variables
+        run: |
+          echo "PROJECT_PATH=ReviewVisualizer.${{ matrix.project }}/ReviewVisualizer.${{ matrix.project }}.csproj" >> $GITHUB_ENV
+          echo "PUBLISH_PATH=ReviewVisualizer.${{ matrix.project }}" >> $GITHUB_ENV
+      
+      - name: Prepare environment
+        uses: ./.github/workflows/actions/prepare-net-env
+        with:
+          os: ${{ env.OS }}
+          project-path: $PROJECT_PATH
+
+      - name: Publish 📂
+        run: dotnet build $PROJECT_PATH --configuration Release --no-restore
