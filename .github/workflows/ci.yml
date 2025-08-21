@@ -89,11 +89,11 @@ jobs:
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
       
       - name: Generate user-friendly coverage report
-        if: succes()
+        if: success()
         run: reportgenerator -reports:"ReviewVisualizer.Generator.Tests\TestResults\*\coverage.cobertura.xml" -targetdir:"coveragereport"  -reporttypes:Html
       
       - name: Upload Html Coverage Report
-        if: always()
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
