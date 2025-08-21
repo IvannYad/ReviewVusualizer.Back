@@ -160,7 +160,7 @@ jobs:
       - name: Set env variables
         run: |
           echo "PROJECT_PATH=ReviewVisualizer.${{ matrix.project }}/ReviewVisualizer.${{ matrix.project }}.csproj" >> $GITHUB_ENV
-          echo "PUBLISH_PATH=ReviewVisualizer.${{ matrix.project }}" >> $GITHUB_ENV
+          echo "PUBLISH_PATH=ReviewVisualizer.${{ matrix.project }}/publish" >> $GITHUB_ENV
       
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
