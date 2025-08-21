@@ -21,7 +21,7 @@ runs:
       if: ${{ inputs.os == 'windows-latest' }}
       env:
         PROJECT_PATH: ${{ inputs.project-path }}
-      run: dotnet restore $env:PROJECT_PATH
+      run: dotnet restore $PROJECT_PATH
       shell: pwsh
 
     - name: Install dependencies 📂 (Linux/Mac)

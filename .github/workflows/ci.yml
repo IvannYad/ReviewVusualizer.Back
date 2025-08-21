@@ -27,7 +27,7 @@ jobs:
         uses: ./.github/workflows/actions/prepare-net-env
         with:
           os: ${{ matrix.os }}
-          project_path: $PROJECT_PATH
+          project-path: $PROJECT_PATH
 
       - name: Build 🧱
         run: dotnet build $PROJECT_PATH --configuration Release --no-restore
