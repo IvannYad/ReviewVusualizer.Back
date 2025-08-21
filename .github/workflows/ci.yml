@@ -155,7 +155,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: unit-test-report
-          path: ReviewVisualizer.Generator.IntegartionTests/TestResults/IntegrationTests.html
+          path: ReviewVisualizer.Generator.IntegrationTests/TestResults/IntegrationTests.html
 
   publish:
     needs: integartion-test
