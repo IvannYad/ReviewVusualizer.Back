@@ -18,20 +18,20 @@ jobs:
           echo "PROJECT_PATH=ReviewVisualizer.${{ matrix.project }}/ReviewVisualizer.${{ matrix.project }}.csproj" >> $GITHUB_ENV
           echo "AZURE_WEBAPP_PACKAGE_PATH=publish.${{ matrix.project }}" >> $GITHUB_ENV
       
-      - name: Prepare environment
-        uses: ./.github/workflows/actions/prepare-net-env
-        with:
-          os: 'ubuntu_latest'
-          project-path: $PROJECT_PATH
+      # - name: Prepare environment
+      #   uses: ./.github/workflows/actions/prepare-net-env
+      #   with:
+      #     os: 'ubuntu_latest'
+      #     project-path: $PROJECT_PATH
 
-      - name: Build 🧱
-        run: dotnet build $PROJECT_PATH --configuration Release --no-restore
+      # - name: Build 🧱
+      #   run: dotnet build $PROJECT_PATH --configuration Release --no-restore
 
-      - name: Set output data
-        id: set-output
-        run: |
-          echo "project=${{ matrix.project }} >> $GITHUB_OUTPUT"
-          echo "project-path=$PROJECT_PATH" >> $GITHUB_OUTPUT
+      # - name: Set output data
+      #   id: set-output
+      #   run: |
+      #     echo "project=${{ matrix.project }} >> $GITHUB_OUTPUT"
+      #     echo "project-path=$PROJECT_PATH" >> $GITHUB_OUTPUT
 
       # - name: Publish
       #   run: dotnet publish WebApi -c Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
