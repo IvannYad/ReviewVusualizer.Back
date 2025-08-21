@@ -48,6 +48,7 @@ jobs:
   unit-test:
     name: Unit tests (for Generator Project)
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -123,13 +124,6 @@ jobs:
         with:
           os: ${{ env.OS }}
           project_path: $TEST_PROJECT_PATH
-      
-      - name: Wait for SQL Server
-        run: |
-          until /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${{ env.TEST_DB_PASSWORD }} -Q "SELECT 1" > /dev/null 2>&1; do
-            echo "Waiting for SQL Server..."
-            sleep 5
-          done
       
       - name: Install dotnet-ef
         run: dotnet tool install --global dotnet-ef
