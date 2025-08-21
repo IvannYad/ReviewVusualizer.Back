@@ -17,7 +17,7 @@ using System.Text.Json.Serialization;
 
 namespace VisualizerProject
 {
-    public static class Program
+    public class Program
     {
         public static void Main(string[] args)
         {

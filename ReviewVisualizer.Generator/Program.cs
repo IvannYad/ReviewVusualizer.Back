@@ -19,7 +19,7 @@ using System.Text.Json.Serialization;
 
 namespace GeneratorProject
 {
-    public static class Program
+    public class Program
     {
         public static void Main(string[] args)
         {

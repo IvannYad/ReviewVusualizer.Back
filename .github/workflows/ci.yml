@@ -165,11 +165,11 @@ jobs:
 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Archive production artifacts
+      - name: Upload MegaLinter artifacts artifacts
         if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
-          name: MegaLinter reports
+          name: code-quality-reports
           include-hidden-files: "true"
           path: |
             megalinter-reports
