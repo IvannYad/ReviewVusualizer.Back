@@ -200,15 +200,16 @@ jobs:
           category: "/language:${{ env.PROG_LANG }}"
           output: sarif-results
 
-      - name: Install SARIF Tools
-        run: pip install sarif-tools
-
-      - name: Convert SARIF to HTML
+      - name: Generate HTML report
+        if: always()
+        id: generate-security-report
         run: |
+          pip install sarif-tools
           mkdir reports
           sarif-html sarif-results/*.sarif -o reports/codeql-report.html
 
       - name: Upload HTML report
+        if: steps.generate-security-report.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: codeql-html-report
