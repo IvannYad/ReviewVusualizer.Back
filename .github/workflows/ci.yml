@@ -24,7 +24,7 @@ jobs:
           echo "AZURE_WEBAPP_PACKAGE_PATH=publish.${{ matrix.project }}" >> $GITHUB_ENV
       
       - name: Prepare environment
-        uses: ./.github/workflows/prepare-net-environment.yml
+        uses: ./.github/workflows/actions/prepare-net-env
         with:
           os: ${{ matrix.os }}
           project_path: $PROJECT_PATH

@@ -1,0 +1,32 @@
+name: Prepare .NET environment
+description: Actions that prepares .NET environment for the work.
+inputs:
+  os:
+    description: Operating system to run on
+    default: ubuntu-latest
+    required: false
+  project-path:
+    required: true
+    description: Path to the project file relative to repository root folder
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET 📦
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        cache: true
+
+    - name: Install dependencies 📂 (Windows)
+      if: ${{ inputs.os == 'windows-latest' }}
+      env:
+        PROJECT_PATH: ${{ inputs.project-path }}
+      run: dotnet restore $env:PROJECT_PATH
+      shell: pwsh
+
+    - name: Install dependencies 📂 (Linux/Mac)
+      if: ${{ inputs.os != 'windows-latest' }}
+      env:
+        PROJECT_PATH: ${{ inputs.project-path }}
+      run: dotnet restore $PROJECT_PATH
+      shell: bash
