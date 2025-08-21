@@ -1,0 +1,18 @@
+name: Review Visualizer Continious Deployment(CD)
+on:
+  workflow_run:
+    workflows: ["ci"]
+    types:
+      - completed
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        project: ['Generator','WebApi']
+        os: ['ubuntu-latest', 'windows-latest']
+    runs-on: ${{ matrix.os }}
+    steps:
+        - name: Set env variables
+          run: |
+            echo "PROJECT_PATH=ReviewVisualizer.${{ matrix.project-path }}/ReviewVisualizer.${{ matrix.project-path }}.csproj" >> $GITHUB_ENV
+            echo "AZURE_WEBAPP_PACKAGE_PATH=ReviewVisualizer.${{ matrix.project-path }}/ReviewVisualizer.${{ matrix.project-path }}.csproj" >> $GITHUB_ENV
