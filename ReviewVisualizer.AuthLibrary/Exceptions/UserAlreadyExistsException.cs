@@ -1,6 +1,6 @@
 ﻿namespace ReviewVisualizer.AuthLibrary.Exceptions
 {
-    public class UserAlreadyExistsException: Exception
+    public class UserAlreadyExistsException : Exception
     {
         public UserAlreadyExistsException(string userName)
             : this(userName, null)

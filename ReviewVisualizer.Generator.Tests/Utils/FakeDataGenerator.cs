@@ -18,7 +18,7 @@ namespace ReviewVisualizer.Generator.Tests.Utils
             var departmentFaker = ModelFakers.DepartmentFaker;
             var department = departmentFaker.Generate();
             department.Id = Interlocked.Increment(ref _departmentId);
-            
+
             return department;
         }
 
@@ -26,7 +26,7 @@ namespace ReviewVisualizer.Generator.Tests.Utils
         {
             var teacherFaker = ModelFakers.TeacherFaker;
             var teacher = teacherFaker.Generate();
-            
+
             teacher.Department = departments.GetRandomElement();
             teacher.DepartmentId = teacher.Department.Id;
             teacher.Id = Interlocked.Increment(ref _teacherId);

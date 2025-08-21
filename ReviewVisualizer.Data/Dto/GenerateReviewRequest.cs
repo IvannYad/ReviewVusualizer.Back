@@ -13,7 +13,7 @@ namespace ReviewVisualizer.Data.Dto
         public GeneratorType Type { get; set; }
 
         public TimeSpan? Delay { get; set; }
-        
+
         public string? Cron { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

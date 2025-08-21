@@ -31,7 +31,7 @@ namespace ReviewVisualizer.Generator.IntegrationTests
                 .GetHandler(TestUser.NotAuthorized);
             var generatorClient = _visualizerFixture.GeneratorFactory
                 .CreateDefaultClient(visitorHandler);
-            
+
             // Act.
             var response = await generatorClient.GetAsync(ReviewerControllerBaseAddress);
 
@@ -57,7 +57,7 @@ namespace ReviewVisualizer.Generator.IntegrationTests
             // Assert.
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
-        
+
         [Theory]
         [InlineData(TestUser.GeneratorAdmin_FireAndForget)]
         [InlineData(TestUser.GeneratorAdmin_Delayed)]
@@ -140,7 +140,7 @@ namespace ReviewVisualizer.Generator.IntegrationTests
             // Act.
             var response = await generatorClient
                 .PostAsJsonAsync(ReviewerControllerBaseAddress, reviewerCreateDto);
-            
+
             var reviewerId = (await response.Content.GetEntityAsync<Reviewer>())?.Id;
             var getReviewerResponse = await generatorClient
                 .GetAsync($"{ReviewerControllerBaseAddress}/{reviewerId}");

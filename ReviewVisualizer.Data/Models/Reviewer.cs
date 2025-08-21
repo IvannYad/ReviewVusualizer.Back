@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ReviewVisualizer.Data.Models
 {
-    public class Reviewer: IEquatable<Reviewer>
+    public class Reviewer : IEquatable<Reviewer>
     {
         [Key]
         public int Id { get; set; }

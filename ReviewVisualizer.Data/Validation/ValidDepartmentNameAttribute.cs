@@ -6,7 +6,7 @@ namespace ReviewVisualizer.Data.Validation
     public class ValidDepartmentNameAttribute : ValidationAttribute
     {
         private readonly Regex validDeptNameRegexp = new Regex(@"^[A-Z]+$");
-        
+
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             string? deptName = value as string;

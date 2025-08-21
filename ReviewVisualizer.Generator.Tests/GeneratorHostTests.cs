@@ -117,7 +117,7 @@ namespace ReviewVisualizer.Generator.Tests
 
             // Assert.
             _mockHangfireProxy.Verify(pr =>
-                pr.SheduleDelayed(queueName, It.IsAny<Expression<Action>>(), delay), 
+                pr.SheduleDelayed(queueName, It.IsAny<Expression<Action>>(), delay),
                 Times.Once);
         }
 

@@ -4,7 +4,7 @@ using ReviewVisualizer.Data.Models;
 
 namespace ReviewVisualizer.Data
 {
-    public class ApplicationDbContext :DbContext
+    public class ApplicationDbContext : DbContext
     {
         private static readonly object _createNewLock = new object();
         public static ApplicationDbContext CreateNew(ApplicationDbContext original)
@@ -18,7 +18,7 @@ namespace ReviewVisualizer.Data
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-            
+
         }
 
         public virtual DbSet<Department> Departments { get; set; }

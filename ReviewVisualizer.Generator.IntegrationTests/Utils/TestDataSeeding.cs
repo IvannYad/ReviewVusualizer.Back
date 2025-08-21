@@ -27,10 +27,10 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
 
                 context.Users.AddRange(userTypesAssociations.Values);
                 context.SaveChanges();
-                
+
                 if (userTypesIds is not null)
                 {
-                    foreach(var utAssoc in userTypesAssociations)
+                    foreach (var utAssoc in userTypesAssociations)
                     {
                         userTypesIds[utAssoc.Key] = utAssoc.Value;
                     }
@@ -115,25 +115,29 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
         {
             return userType switch
             {
-                TestUser.Visitor => [new UserClaim() {
+                TestUser.Visitor => [new UserClaim()
+                {
                     User = user,
                     ClaimType = ClaimTypes.SystemRole.GetClaimType(),
                     ClaimValue = SystemRoles.Visitor.ToString(),
                 }],
 
-                TestUser.Analyst => [new UserClaim() {
+                TestUser.Analyst => [new UserClaim()
+                {
                     User = user,
                     ClaimType = ClaimTypes.SystemRole.GetClaimType(),
                     ClaimValue = SystemRoles.Analyst.ToString(),
                 }],
 
                 TestUser.GeneratorAdmin_FireAndForget => [
-                    new UserClaim() {
+                    new UserClaim()
+                    {
                         User = user,
                         ClaimType = ClaimTypes.SystemRole.GetClaimType(),
                         ClaimValue = SystemRoles.GeneratorAdmin.ToString(),
                     },
-                    new UserClaim() {
+                    new UserClaim()
+                    {
                         User = user,
                         ClaimType = ClaimTypes.GeneratorModifications.GetClaimType(),
                         ClaimValue = GeneratorModifications.ModifyFireAndForget.ToString(),
@@ -141,12 +145,14 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                 ],
 
                 TestUser.GeneratorAdmin_Delayed => [
-                    new UserClaim() {
+                    new UserClaim()
+                    {
                         User = user,
                         ClaimType = ClaimTypes.SystemRole.GetClaimType(),
                         ClaimValue = SystemRoles.GeneratorAdmin.ToString(),
                     },
-                    new UserClaim() {
+                    new UserClaim()
+                    {
                         User = user,
                         ClaimType = ClaimTypes.GeneratorModifications.GetClaimType(),
                         ClaimValue = GeneratorModifications.ModifyDelayed.ToString(),
@@ -154,25 +160,29 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                 ],
 
                 TestUser.GeneratorAdmin_Recurring => [
-                    new UserClaim() {
+                    new UserClaim()
+                    {
                         User = user,
                         ClaimType = ClaimTypes.SystemRole.GetClaimType(),
                         ClaimValue = SystemRoles.GeneratorAdmin.ToString(),
                     },
-                    new UserClaim() {
+                    new UserClaim()
+                    {
                         User = user,
                         ClaimType = ClaimTypes.GeneratorModifications.GetClaimType(),
                         ClaimValue = GeneratorModifications.ModifyRecurring.ToString(),
                     },
                 ],
 
-                TestUser.Owner => [new UserClaim() {
+                TestUser.Owner => [new UserClaim()
+                {
                     User = user,
                     ClaimType = ClaimTypes.SystemRole.GetClaimType(),
                     ClaimValue = SystemRoles.Owner.ToString(),
                 }],
 
-                _ => [new UserClaim() {
+                _ => [new UserClaim()
+                {
                     User = user,
                     ClaimType = ClaimTypes.SystemRole.GetClaimType(),
                     ClaimValue = SystemRoles.None.ToString(),

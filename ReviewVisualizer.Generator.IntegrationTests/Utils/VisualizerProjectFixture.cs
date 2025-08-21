@@ -62,7 +62,7 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                     continue;
 
                 var cookieContainer = new CookieContainer();
-                
+
                 if (userType is TestUser.NotAuthorized)
                 {
                     usersCookies.Add(userType, new CookieContainer());
@@ -84,7 +84,7 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                     throw new Exception($"Cannot obtain client for {user.UserName}");
 
                 var cookieHeader = loginResponse.Headers.GetValues("Set-Cookie").First();
-                
+
                 // Since BaseAddress for Visualizer and Generator are the same not need to set cookie for both of them.
                 cookieContainer.SetCookies(GeneratorFactory.Server.BaseAddress,
                     cookieHeader);
