@@ -8,22 +8,15 @@ env:
   TEST_DB_PASSWORD: Pass%word123!
 jobs:
   lint:
-    strategy:
-      matrix:
-        project: ['Generator','WebApi']
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Set env variables
-        run: |
-          echo "PROJECT_PATH=ReviewVisualizer.${{ matrix.project }}/ReviewVisualizer.${{ matrix.project }}.csproj" >> $GITHUB_ENV
       
-      - name: Prepare environment
-        uses: ./.github/workflows/actions/prepare-net-env
+      - name: Setup .NET 📦
+        uses: actions/setup-dotnet@v4
         with:
-          os: ${{ env.OS }}
-          project-path: $PROJECT_PATH
+          dotnet-version: '8.0.x'
 
       - name: Code lint / formatting check
         run: dotnet format --verify-no-changes
@@ -100,7 +93,6 @@ jobs:
           path: coveragereport
 
   integartion-test:
-    needs: unit-test
     runs-on: ubuntu-latest
     services:
       mssql:

@@ -1,11 +1,11 @@
-﻿using ReviewVisualizer.Generator.IntegrationTests.Utils;
-using System.Net;
-using FluentAssertions;
-using System.Net.Http.Json;
-using ReviewVisualizer.Data.Enums;
+﻿using FluentAssertions;
 using ReviewVisualizer.Data.Dto;
+using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
+using ReviewVisualizer.Generator.IntegrationTests.Utils;
 using ReviewVisualizer.TestUtils;
+using System.Net;
+using System.Net.Http.Json;
 using Xunit.Abstractions;
 
 namespace ReviewVisualizer.Generator.IntegrationTests

@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using ReviewVisualizer.Data;
-using ReviewVisualizer.Data.Models;
-using ReviewVisualizer.Data.Dto;
-using System.Drawing;
-using Microsoft.EntityFrameworkCore;
-using ReviewVisualizer.Data.Enums;
 using Microsoft.AspNetCore.Authorization;
-using ReviewVisualizer.AuthLibrary;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using ReviewVisualizer.AuthLibrary;
+using ReviewVisualizer.Data;
+using ReviewVisualizer.Data.Dto;
+using ReviewVisualizer.Data.Enums;
+using ReviewVisualizer.Data.Models;
+using System.Drawing;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {

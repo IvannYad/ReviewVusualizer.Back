@@ -1,14 +1,14 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using ReviewVisualizer.Data;
-using ReviewVisualizer.Data.Models;
-using ReviewVisualizer.Data.Dto;
-using ReviewVisualizer.Generator.Generator;
-using Microsoft.EntityFrameworkCore;
-using Autofac;
+﻿using Autofac;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.AuthLibrary;
+using ReviewVisualizer.Data;
+using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
+using ReviewVisualizer.Data.Models;
+using ReviewVisualizer.Generator.Generator;
 using System.Diagnostics;
 
 namespace ReviewVisualizer.Generator.Controllers

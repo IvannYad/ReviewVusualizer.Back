@@ -1,19 +1,19 @@
-using Microsoft.EntityFrameworkCore;
-using ReviewVisualizer.Data.Mapper;
-using ReviewVisualizer.Data;
-using ReviewVisualizer.WebApi;
-using System.Text.Json.Serialization;
-using Serilog;
-using Serilog.Events;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using ReviewVisualizer.AuthLibrary;
-using ReviewVisualizer.WebApi.Services;
-using ReviewVisualizer.AuthLibrary.Extensions;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.CookiePolicy;
+using ReviewVisualizer.AuthLibrary;
+using ReviewVisualizer.AuthLibrary.Extensions;
+using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Enums;
+using ReviewVisualizer.Data.Mapper;
+using ReviewVisualizer.WebApi;
+using ReviewVisualizer.WebApi.Services;
+using Serilog;
+using Serilog.Events;
+using System.Text.Json.Serialization;
 
 namespace VisualizerProject
 {

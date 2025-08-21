@@ -1,11 +1,11 @@
 ﻿using Autofac;
+using AutoFixture;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Moq;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Generator.Generator;
-using Moq;
-using AutoFixture;
 
 namespace ReviewVisualizer.Generator.Tests.Utils
 {

@@ -1,21 +1,21 @@
-using Microsoft.EntityFrameworkCore;
-using ReviewVisualizer.Data;
-using ReviewVisualizer.Data.Mapper;
-using ReviewVisualizer.Generator.Generator;
-using Serilog;
-using System.Text.Json.Serialization;
-using Serilog.Events;
-using Hangfire;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
-using ReviewVisualizer.AuthLibrary.Extensions;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.DataProtection;
-using ReviewVisualizer.AuthLibrary;
 using Microsoft.AspNetCore.CookiePolicy;
-using ReviewVisualizer.Generator.Utils;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
+using ReviewVisualizer.AuthLibrary;
+using ReviewVisualizer.AuthLibrary.Extensions;
+using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Enums;
+using ReviewVisualizer.Data.Mapper;
+using ReviewVisualizer.Generator.Generator;
+using ReviewVisualizer.Generator.Utils;
+using Serilog;
+using Serilog.Events;
+using System.Text.Json.Serialization;
 
 namespace GeneratorProject
 {

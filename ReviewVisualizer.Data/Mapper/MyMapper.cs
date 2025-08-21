@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using ReviewVisualizer.Data.Models;
 using ReviewVisualizer.Data.Dto;
+using ReviewVisualizer.Data.Models;
 
 namespace ReviewVisualizer.Data.Mapper
 {

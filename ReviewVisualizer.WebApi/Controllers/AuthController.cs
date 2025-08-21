@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.AuthLibrary.Exceptions;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.WebApi.Services;
 using LoginRequest = ReviewVisualizer.Data.Dto.LoginRequest;
 using RegisterRequest = ReviewVisualizer.Data.Dto.RegisterRequest;
-using Microsoft.AspNetCore.Authorization;
-using ReviewVisualizer.AuthLibrary;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {

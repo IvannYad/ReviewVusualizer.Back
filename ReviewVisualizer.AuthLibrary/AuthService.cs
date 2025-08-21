@@ -6,11 +6,11 @@ using ReviewVisualizer.AuthLibrary.Exceptions;
 using ReviewVisualizer.AuthLibrary.Extensions;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Dto;
+using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
 using System.Security.Claims;
-using MyClaimTypes = ReviewVisualizer.AuthLibrary.Enums.ClaimTypes;
 using ClaimTypes = System.Security.Claims.ClaimTypes;
-using ReviewVisualizer.Data.Enums;
+using MyClaimTypes = ReviewVisualizer.AuthLibrary.Enums.ClaimTypes;
 
 namespace ReviewVisualizer.WebApi.Services
 {

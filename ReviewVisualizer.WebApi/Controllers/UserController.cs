@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using ReviewVisualizer.Data;
-using ReviewVisualizer.Data.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.AuthLibrary.Enums;
 using ReviewVisualizer.AuthLibrary.Extensions;
+using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
+using ReviewVisualizer.Data.Models;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
