@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/workflows/actions/prepare-net-env
         with:
           os: ${{ env.OS }}
-          project-path: $PROJECT_PATH
+          project-path: ${{ env.PROJECT_PATH }}
 
       - name: Build 🧱
         run: dotnet build $PROJECT_PATH --configuration Release --no-restore
@@ -61,7 +61,7 @@ jobs:
         uses: ./.github/workflows/actions/prepare-net-env
         with:
           os: ${{ env.OS }}
-          project_path: $TEST_PROJECT_PATH
+          project_path: ${{ env.TEST_PROJECT_PATH }}
       
       - name: Run Unit Tests
         id: testing-step
@@ -121,7 +121,7 @@ jobs:
         uses: ./.github/workflows/actions/prepare-net-env
         with:
           os: ${{ env.OS }}
-          project-path: $TEST_PROJECT_PATH
+          project-path: ${{ env.TEST_PROJECT_PATH }}
       
       - name: Install dotnet-ef
         run: dotnet tool install --global dotnet-ef
@@ -166,7 +166,7 @@ jobs:
         uses: ./.github/workflows/actions/prepare-net-env
         with:
           os: ${{ env.OS }}
-          project-path: $PROJECT_PATH
+          project-path: ${{ env.PROJECT_PATH }}
 
       - name: Publish 📂
         run: dotnet publish $PROJECT_PATH --configuration Release --no-restore --output $PUBLISH_PATH
