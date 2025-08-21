@@ -23,7 +23,7 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
         with:
-          os: $OS
+          os: ${{ env.OS }}
           project-path: $PROJECT_PATH
 
       - name: Build 🧱
@@ -47,28 +47,28 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
         with:
-          os: $OS
+          os: ${{ env.OS }}
           project_path: $TEST_PROJECT_PATH
       
       - name: Execute Test unit tests
         run: dotnet test $TEST_PROJECT_PATH --configuration Release
 
   prepare-env-for-integration-testing:
-    needs: [unit-test]
+    needs: unit-test
     runs-on: ubuntu-latest
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
         run: echo "Preparing test env for ${{ needs.build.outputs.project }}"
 
   integartion-test:
-    needs: [prepare-env-for-integration-testing]
+    needs: prepare-env-for-integration-testing
     runs-on: ubuntu-latest
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
         run: echo "Executing integration tests for ${{ needs.build.outputs.project }}"
 
   publish:
-    needs: [integartion-test]
+    needs: integartion-test
     runs-on: ubuntu-latest
     steps:
       - name: Rublish ReviewVisualizer ${{ needs.build.outputs.project }}
