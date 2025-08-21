@@ -186,34 +186,41 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          languages: ${{ env.PROG_LANG }}
+          dotnet-version: '8.0.x'
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
+      - name: Restore .NET dependencies
+        run: dotnet restore
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+      # Cache DC’s vulnerability DB to speed up runs
+      - name: Cache Dependency-Check DB
+        uses: actions/cache@v4
         with:
-          category: "/language:${{ env.PROG_LANG }}"
-          output: sarif-results
+          path: ~/.dependency-check
+          key: dc-db-${{ runner.os }}-v9-${{ github.run_id }}
+          restore-keys: |
+            dc-db-${{ runner.os }}-v9-
 
-      - name: Generate HTML report
-        if: always()
-        id: generate-security-report
-        run: |
-          pip install sarif-tools
-          mkdir reports
-          sarif-html sarif-results/*.sarif -o reports/codeql-report.html
+      - name: Run OWASP Dependency-Check (HTML)
+        uses: dependency-check/Dependency-Check_Action@v4
+        with:
+          scan: .
+          out: dependency-check-report
+          format: HTML
+          project: ${{ github.repository }}-${{ github.ref_name }}
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+            --nvdApiWait 0
+          data-directory: ~/.dependency-check
 
       - name: Upload HTML report
-        if: steps.generate-security-report.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: codeql-html-report
-          path: reports/codeql-report.html
+          name: dependency-check-html
+          path: dependency-check-report/*.html
 
   publish:
     strategy:
