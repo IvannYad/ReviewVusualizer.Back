@@ -149,7 +149,7 @@ jobs:
           ConnectionStrings__DefaultConnection: "${{ env.CONNECTION_STRING }}"
       - name: test
         if: failure()
-        run: ls
+        run: ls -r
       - name: Upload unit test report on tests failure
         if: failure() && steps.testing-step.outcome == 'failure'
         uses: actions/upload-artifact@v4
