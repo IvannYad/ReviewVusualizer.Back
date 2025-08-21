@@ -175,5 +175,5 @@ jobs:
       - name: Upload publish artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ toLower(matrix.project) }}-publish-artifacts
+          name: ${{ matrix.project }}-publish-artifacts
           path: $PUBLISH_PATH
