@@ -50,10 +50,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Prepare environment
-        uses: ./.github/workflows/prepare-net-environment.yml
+        uses: ./.github/workflows/actions/prepare-net-env
         with:
           os: ${{ needs.build.outputs.os }}
           project_path: ${{ needs.build.outputs.project-path }}
+      
       - name: Execute Test unit tests
         env:
           TEST_PROJECT: ReviewVisualizer.${{ needs.build.outputs.project }}.Tests/ReviewVisualizer${{ needs.build.outputs.project }}.Tests.csproj
