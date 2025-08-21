@@ -136,7 +136,7 @@ jobs:
         run: |
           dotnet ef database update --project $DATA_PROJECT_PATH \
           --startup-project $STARTUP_PROJECT_PATH \
-          --connection $CONNECTION_STRING
+          --connection "$CONNECTION_STRING"
       
       - name: Run integration tests
         run: |
