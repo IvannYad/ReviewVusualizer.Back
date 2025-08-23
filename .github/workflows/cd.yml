@@ -30,6 +30,7 @@ jobs:
           --startup-project $STARTUP_PROJECT_PATH \
           --connection "$CONNECTION_STRING"
   deploy:
+    environment: production
     strategy:
       matrix:
         project: ['Generator','WebApi']
