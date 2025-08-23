@@ -4,14 +4,9 @@ on:
     workflows: ["Review Visualizer Continious Integration(CI)"]
     types:
       - completed
-env:
-  AZURE_WEBAPP_NAME: my-app    # Set this to your application's name
-  AZURE_WEBAPP_PACKAGE_PATH: '.'      # Set this to the path to your web app project, defaults to the repository root
-  DOTNET_VERSION: '6.0.x'
-  OS: ubuntu-latest
 jobs:
   configure-database:
-    runs-on: ${{ env.OS }}
+    runs-on: ubuntu-latest
     env:
       DATA_PROJECT_PATH: ReviewVisualizer.Data/ReviewVisualizer.Data.csproj
       STARTUP_PROJECT_PATH: ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.csproj
@@ -32,7 +27,7 @@ jobs:
     strategy:
       matrix:
         project: ['Generator','WebApi']
-    runs-on: ${{ env.OS }}
+    runs-on: ubuntu-latest
     steps:
         - name: Set env variables
           run: |
