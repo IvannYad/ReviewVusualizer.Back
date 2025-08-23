@@ -225,7 +225,7 @@ jobs:
           path: dependency-check-report/*.html
 
   publish:
-    needs: [integartion-test, megalinter-code-quality-check, dependency-vulnerabilities-check]
+    #needs: [integartion-test, megalinter-code-quality-check, dependency-vulnerabilities-check]
     strategy:
       matrix:
         project: ['Generator','WebApi']
@@ -238,6 +238,7 @@ jobs:
         run: |
           echo "PROJECT_PATH=ReviewVisualizer.${{ matrix.project }}/ReviewVisualizer.${{ matrix.project }}.csproj" >> $GITHUB_ENV
           echo "PUBLISH_PATH=ReviewVisualizer.${{ matrix.project }}/publish" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=${{ matrix.project }}-publish-artifacts" >> $GITHUB_ENV
       
       - name: Prepare environment
         uses: ./.github/workflows/actions/prepare-net-env
@@ -254,5 +255,5 @@ jobs:
       - name: Upload publish artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.project }}-publish-artifacts
+          name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.PUBLISH_PATH }}

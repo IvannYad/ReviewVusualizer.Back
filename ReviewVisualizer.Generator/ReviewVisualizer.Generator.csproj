@@ -5,9 +5,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 	<EnableNETAnalyzers>true</EnableNETAnalyzers>
-  </PropertyGroup>
+  	  </PropertyGroup>
 
-  <ItemGroup>
+  
+
+  <PropertyGroup>
+	<NuGetAudit>true</NuGetAudit>
+    <NuGetAuditLevel>critical</NuGetAuditLevel>
+	<NuGetAuditMode>all</NuGetAuditMode>
+  </PropertyGroup><ItemGroup>
     <PackageReference Include="Autofac" Version="8.3.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="Hangfire" Version="1.8.20" />
