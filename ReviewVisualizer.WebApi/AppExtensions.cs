@@ -59,7 +59,7 @@ namespace ReviewVisualizer.WebApi
                 };
 
                 dbContext.Users.Add(admin);
-                dbContext.SaveChanges(); 
+                dbContext.SaveChanges();
             }
         }
     }
