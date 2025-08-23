@@ -110,6 +110,7 @@ namespace VisualizerProject
                 app.UseDeveloperExceptionPage();
             else
                 app.UseExceptionHandler();
+
             app.UseStatusCodePages();
 
             app.UseHttpsRedirection();
@@ -132,11 +133,7 @@ namespace VisualizerProject
             app.StartProcessorHost();
             app.StartRatingCalculationEngine();
 
-            var mvcOpts = app.Services.GetRequiredService<IOptions<MvcOptions>>();
-            foreach (var f in mvcOpts.Value.OutputFormatters)
-            {
-                Console.WriteLine(f.GetType().FullName);
-            }
+            app.AddAdminUser();
 
             app.Run();
         }

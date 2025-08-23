@@ -17,22 +17,6 @@ namespace ReviewVisualizer.Generator.IntegrationTests.CustomWebApplicationFactor
         {
             // Add Autofac for test host
             builder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-            builder.ConfigureContainer<ContainerBuilder>(containerBuilder =>
-            {
-                //// This only overrides ApplicationDbContext.
-                //containerBuilder.Register(ctx =>
-                //{
-                //    var config = ctx.Resolve<IConfiguration>();
-
-                //    var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                //        .UseInMemoryDatabase(config["TestDbName"]!)
-                //        .Options;
-
-                //    return new ApplicationDbContext(options);
-                //})
-                //.AsSelf();
-            });
-
             return base.CreateHost(builder);
         }
 
