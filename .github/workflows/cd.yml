@@ -57,7 +57,7 @@ jobs:
             path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
 
         - name: Output contents
-          run: ls
+          run: ls -R ./artifact
 
         # - name: Run Azure webapp deploy action for ${{ matrix.project }}
         #   uses: azure/webapps-deploy@v3
