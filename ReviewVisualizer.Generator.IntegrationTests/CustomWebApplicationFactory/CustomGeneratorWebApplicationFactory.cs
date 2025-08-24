@@ -3,10 +3,8 @@ using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using ReviewVisualizer.Data;
 
 namespace ReviewVisualizer.Generator.IntegrationTests.CustomWebApplicationFactory
 {

@@ -21,6 +21,7 @@ namespace GeneratorProject
 {
     public class Program
     {
+        private const int SqlServerMaxRetriesOnFailureCount = 3;
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -46,7 +47,10 @@ namespace GeneratorProject
                 containerBuilder.Register(c =>
                 {
                     var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-                    optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                    optionsBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), opts =>
+                    {
+                        opts.EnableRetryOnFailure(SqlServerMaxRetriesOnFailureCount);
+                    });
                     return new ApplicationDbContext(optionsBuilder.Options);
                 }).AsSelf();
 

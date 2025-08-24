@@ -1,12 +1,9 @@
 name: Review Visualizer Continious Deployment(CD)
 on:
-  # workflow_run:
-  #   workflows: ["Review Visualizer Continious Integration(CI)"]
-  #   types:
-  #     - completed
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Review Visualizer Continious Integration(CI)"]
+    types:
+      - completed
 permissions:
   id-token: write
   contents: read

@@ -1,13 +1,10 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.AuthLibrary.Extensions;
 using ReviewVisualizer.Data;
-using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Mapper;
 using ReviewVisualizer.WebApi;
 using ReviewVisualizer.WebApi.Services;
@@ -19,6 +16,7 @@ namespace VisualizerProject
 {
     public class Program
     {
+        private const int SqlServerMaxRetriesOnFailureCount = 3;
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -59,7 +57,10 @@ namespace VisualizerProject
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), opts =>
+                {
+                    opts.EnableRetryOnFailure(SqlServerMaxRetriesOnFailureCount);
+                });
             }, ServiceLifetime.Scoped);
             if (builder.Environment.IsDevelopment())
                 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
