@@ -9,13 +9,13 @@ permissions:
   contents: read
 env: 
   ARTIFACTS_DOWNLOAD_PATH: "./artifact"
+  CONNECTION_STRING: Server=tcp:${{ secrets.REVIEW_VISUALIZER_SERVER_NAME }},1433;Initial Catalog=${{ secrets.PROD_DB_NAME }};User Id=${{ secrets.DB_LOGIN }};Password=${{ secrets.DB_PASSWORD }};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
 jobs:
   configure-database:
     runs-on: ubuntu-latest
     env:
       DATA_PROJECT_PATH: ReviewVisualizer.Data/ReviewVisualizer.Data.csproj
       STARTUP_PROJECT_PATH: ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.csproj
-      CONNECTION_STRING: Server=tcp:${{ secrets.REVIEW_VISUALIZER_SERVER_NAME }},1433;Initial Catalog=${{ secrets.PROD_DB_NAME }};User Id=${{ secrets.DB_LOGIN }};Password=${{ secrets.DB_PASSWORD }};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,10 +56,17 @@ jobs:
             github-token: ${{ github.token }}
             path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
 
+        - name: Set environment variables for app service
+          run: |
+            az webapp config appsettings set \
+            --name $AZURE_WEBAPP_NAME \
+            --settings ConnectionStrings__DefaultConnection="$CONNECTION_STRING" \
+            Admin__UserName=${{ secrets.REVIEW_VISUALIZER_ADMIN_USERNAME }} Admin__Password=${{ secrets.REVIEW_VISUALIZER_ADMIN_PASSWORD }}
+        
         - name: Run Azure webapp deploy action for ${{ matrix.project }}
           uses: azure/webapps-deploy@v3
           with: 
-            app-name: ${{ env.AZURE_WEBAPP_NAME }} # Replace with your app name
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
             package: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
         
         - name: Azure Logout
