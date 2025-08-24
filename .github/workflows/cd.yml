@@ -52,7 +52,7 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             name: ${{ env.ARTIFACT_NAME }}
-            run: ${{ github.event.workflow_run.id }}
+            run-id: ${{ github.event.workflow_run.id }}
             github-token: ${{ github.token }}
             path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
 
