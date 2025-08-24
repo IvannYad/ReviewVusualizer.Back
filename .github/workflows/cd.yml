@@ -7,6 +7,8 @@ on:
 permissions:
   id-token: write
   contents: read
+env: 
+  ARTIFACTS_DOWNLOAD_PATH: "./artifact"
 jobs:
   configure-database:
     runs-on: ubuntu-latest
@@ -50,6 +52,9 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             name: ${{ env.ARTIFACT_NAME }}
+            run: ${{ github.event.workflow_run.id }}
+            github-token: ${{ github.token }}
+            path: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
 
         - name: Output contents
           run: ls
@@ -58,7 +63,7 @@ jobs:
         #   uses: azure/webapps-deploy@v3
         #   with: 
         #     app-name: ${{ env.AZURE_WEBAPP_NAME }} # Replace with your app name
-        #     package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+        #     package: ${{ env.ARTIFACTS_DOWNLOAD_PATH }}
         
         - name: Azure Logout
           run: |
