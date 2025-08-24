@@ -134,7 +134,7 @@ namespace VisualizerProject
             app.StartProcessorHost();
             app.StartRatingCalculationEngine();
 
-            app.AddAdminUser();
+            //app.AddAdminUser();
 
             app.Run();
         }
