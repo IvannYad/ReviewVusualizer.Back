@@ -141,7 +141,7 @@ namespace VisualizerProject
             app.StartRatingCalculationEngine();
 
             app.AddAdminUser();
-            app.MapHealthChecks("/");
+            app.MapHealthChecks("/health");
 
             app.Run();
         }

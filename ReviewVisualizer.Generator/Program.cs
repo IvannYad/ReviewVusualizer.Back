@@ -169,7 +169,7 @@ namespace GeneratorProject
 
             app.UseSwagger();
             app.UseSwaggerUI();
-            app.MapHealthChecks("/");
+            app.MapHealthChecks("/health");
 
             app.Run();
         }
