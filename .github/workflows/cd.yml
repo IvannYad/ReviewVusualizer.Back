@@ -9,13 +9,13 @@ permissions:
   contents: read
 env: 
   ARTIFACTS_DOWNLOAD_PATH: "./artifact"
+  CONNECTION_STRING: Server=tcp:${{ secrets.REVIEW_VISUALIZER_DB_SERVER_NAME }},1433;Initial Catalog=${{ secrets.PROD_DB_NAME }};User Id=${{ secrets.DB_LOGIN }};Password=${{ secrets.DB_PASSWORD }};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
 jobs:
   configure-database:
     runs-on: ubuntu-latest
     env:
       DATA_PROJECT_PATH: ReviewVisualizer.Data/ReviewVisualizer.Data.csproj
       STARTUP_PROJECT_PATH: ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.csproj
-      CONNECTION_STRING: Server=tcp:${{ secrets.REVIEW_VISUALIZER_DB_SERVER_NAME }},1433;Initial Catalog=${{ secrets.PROD_DB_NAME }};User Id=${{ secrets.DB_LOGIN }};Password=${{ secrets.DB_PASSWORD }};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,8 +34,6 @@ jobs:
       matrix:
         project: ['Generator','WebApi']
     runs-on: ubuntu-latest
-    env:
-      CONNECTION_STRING: Server=tcp:${{ secrets.REVIEW_VISUALIZER_DB_SERVER_NAME }},1433;Initial Catalog=${{ secrets.PROD_DB_NAME }};User Id=${{ secrets.DB_LOGIN }};Password=${{ secrets.DB_PASSWORD }};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
     steps:
         - name: Set env variables
           run: |
