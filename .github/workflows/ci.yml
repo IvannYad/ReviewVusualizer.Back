@@ -225,7 +225,7 @@ jobs:
           path: dependency-check-report/*.html
 
   publish:
-    needs: [integartion-test, megalinter-code-quality-check, dependency-vulnerabilities-check]
+    needs: [unit-test, integartion-test, megalinter-code-quality-check, dependency-vulnerabilities-check]
     strategy:
       matrix:
         project: ['Generator','WebApi']
