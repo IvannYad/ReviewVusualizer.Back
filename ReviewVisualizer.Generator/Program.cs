@@ -29,6 +29,10 @@ namespace GeneratorProject
                 .GetSection("AuthCookieSettings")
                 .Get<CookieSettings>();
 
+            var corsSettings = builder.Configuration
+                .GetSection("CorsSettings")
+                .Get<CorsSettings>()!;
+
             // Logging services.
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Error)
@@ -84,35 +88,36 @@ namespace GeneratorProject
             {
                 opt.AddDefaultPolicy(policy =>
                 {
-                    policy.WithOrigins("https://localhost:3000") // Your React app URL
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .SetPreflightMaxAge(TimeSpan.FromSeconds(10))
+                    policy.WithOrigins(corsSettings.AllowedOrigins)
+                        .WithHeaders(corsSettings.AllowedHeaders)
+                        .WithMethods(corsSettings.AllowedMethods)
+                        .SetPreflightMaxAge(TimeSpan.FromSeconds(corsSettings.PreflightMaxAgeInSeconds))
                         .AllowCredentials();
                 });
             });
+                
             builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
-                .SetApplicationName("ReviewerVisualizer");
+            .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
+            .SetApplicationName("ReviewerVisualizer");
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = cookieSettings!.Name;
+                options.Cookie.Path = cookieSettings!.Path;
+                options.Cookie.SameSite = cookieSettings!.SameSite;
+                options.Cookie.SecurePolicy = cookieSettings!.Secure;
+                options.Cookie.HttpOnly = cookieSettings!.HttpOnly.HasFlag(HttpOnlyPolicy.Always);
+                options.Events.OnRedirectToLogin = context =>
                 {
-                    options.Cookie.Name = cookieSettings!.Name;
-                    options.Cookie.Path = cookieSettings!.Path;
-                    options.Cookie.SameSite = cookieSettings!.SameSite;
-                    options.Cookie.SecurePolicy = cookieSettings!.Secure;
-                    options.Cookie.HttpOnly = cookieSettings!.HttpOnly.HasFlag(HttpOnlyPolicy.Always);
-                    options.Events.OnRedirectToLogin = context =>
-                    {
-                        context.Response.StatusCode = 401;
-                        return Task.CompletedTask;
-                    };
-                    options.Events.OnRedirectToAccessDenied = context =>
-                    {
-                        context.Response.StatusCode = 403;
-                        return Task.CompletedTask;
-                    };
-                });
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                };
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                };
+            });
             builder.Services.AddAuthorizationPolicies()
                 .AddAuthorizationHandlers();
 
@@ -130,6 +135,7 @@ namespace GeneratorProject
                 options.ConstraintMap.Add("generatorType", typeof(GeneratorTypeRouteConstraint<GeneratorType>));
             });
 
+            builder.Services.AddHealthChecks(); 
 
             var app = builder.Build();
 
@@ -163,6 +169,7 @@ namespace GeneratorProject
 
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.MapHealthChecks("/");
 
             app.Run();
         }

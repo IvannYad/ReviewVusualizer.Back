@@ -22,7 +22,11 @@ namespace VisualizerProject
             var builder = WebApplication.CreateBuilder(args);
             var cookieSettings = builder.Configuration
                 .GetSection("AuthCookieSettings")
-                .Get<CookieSettings>();
+                .Get<CookieSettings>()!;
+
+            var corsSettings = builder.Configuration
+                .GetSection("CorsSettings")
+                .Get<CorsSettings>()!;
 
             // Add services to the container.
             Log.Logger = new LoggerConfiguration()
@@ -47,10 +51,10 @@ namespace VisualizerProject
             {
                 opt.AddDefaultPolicy(policy =>
                 {
-                    policy.WithOrigins("https://localhost:3000")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .SetPreflightMaxAge(TimeSpan.FromSeconds(10))
+                    policy.WithOrigins(corsSettings.AllowedOrigins)
+                        .WithHeaders(corsSettings.AllowedHeaders)
+                        .WithMethods(corsSettings.AllowedMethods)
+                        .SetPreflightMaxAge(TimeSpan.FromSeconds(corsSettings.PreflightMaxAgeInSeconds))
                         .AllowCredentials();
                 });
             });
@@ -104,6 +108,8 @@ namespace VisualizerProject
                 options.CustomizeProblemDetails = (ctx) => builder.Environment.IsDevelopment();
             });
 
+            builder.Services.AddHealthChecks();
+
             var app = builder.Build();
 
             // Global exception handling.
@@ -135,6 +141,7 @@ namespace VisualizerProject
             app.StartRatingCalculationEngine();
 
             app.AddAdminUser();
+            app.MapHealthChecks("/");
 
             app.Run();
         }

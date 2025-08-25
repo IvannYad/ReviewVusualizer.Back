@@ -9,7 +9,7 @@ permissions:
   contents: read
 env: 
   ARTIFACTS_DOWNLOAD_PATH: "./artifact"
-  CONNECTION_STRING: Server=tcp:${{ secrets.REVIEW_VISUALIZER_SERVER_NAME }},1433;Initial Catalog=${{ secrets.PROD_DB_NAME }};User Id=${{ secrets.DB_LOGIN }};Password=${{ secrets.DB_PASSWORD }};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+  CONNECTION_STRING: Server=tcp:${{ secrets.REVIEW_VISUALIZER_DB_SERVER_NAME }},1433;Initial Catalog=${{ secrets.PROD_DB_NAME }};User Id=${{ secrets.DB_LOGIN }};Password=${{ secrets.DB_PASSWORD }};Persist Security Info=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
 jobs:
   configure-database:
     runs-on: ubuntu-latest
