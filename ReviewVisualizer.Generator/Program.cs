@@ -145,7 +145,7 @@ namespace GeneratorProject
                 app.UseDeveloperExceptionPage();
             else
                 app.UseExceptionHandler();
-            
+
             app.UseStatusCodePages();
 
             // Security middlewares.
@@ -171,7 +171,7 @@ namespace GeneratorProject
 
             app.UseSwagger();
             app.UseSwaggerUI();
-            
+
             app.Run();
         }
     }
