@@ -62,7 +62,7 @@ jobs:
             --name $AZURE_WEBAPP_NAME \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --settings ConnectionStrings__DefaultConnection="$CONNECTION_STRING" \
-            CorsSettings__AllowedOrigins="https://4.178.205.130" \
+            CorsSettings__AllowedOrigins=${{ secrets.ALLOWED_ORIGINS }} \
             Admin__UserName=${{ secrets.REVIEW_VISUALIZER_ADMIN_USERNAME }} Admin__Password=${{ secrets.REVIEW_VISUALIZER_ADMIN_PASSWORD }}
         
         - name: Run Azure webapp deploy action for ${{ matrix.project }}
