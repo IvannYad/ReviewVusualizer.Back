@@ -95,7 +95,7 @@ namespace GeneratorProject
                         .AllowCredentials();
                 });
             });
-                
+
             builder.Services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
             .SetApplicationName("ReviewerVisualizer");
@@ -135,7 +135,7 @@ namespace GeneratorProject
                 options.ConstraintMap.Add("generatorType", typeof(GeneratorTypeRouteConstraint<GeneratorType>));
             });
 
-            builder.Services.AddHealthChecks(); 
+            builder.Services.AddHealthChecks();
 
             var app = builder.Build();
 
