@@ -1,10 +1,13 @@
-﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
+﻿using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ReviewVisualizer.AuthLibrary;
 
 namespace ReviewVisualizer.Generator.IntegrationTests.CustomWebApplicationFactory
 {
@@ -36,12 +39,12 @@ namespace ReviewVisualizer.Generator.IntegrationTests.CustomWebApplicationFactor
         protected override void ConfigureClient(HttpClient client)
         {
             base.ConfigureClient(client);
-            client.BaseAddress = new Uri("https://localhost:5002/");
+            client.BaseAddress = new Uri("http://localhost:5001/");
         }
 
         protected override TestServer CreateServer(IWebHostBuilder builder)
         {
-            builder.UseUrls("https://localhost:5002");
+            builder.UseUrls("http://localhost:5001");
 
             var server = base.CreateServer(builder);
             return server;

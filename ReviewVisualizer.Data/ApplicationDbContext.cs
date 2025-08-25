@@ -36,6 +36,13 @@ namespace ReviewVisualizer.Data
             modelBuilder.Entity<UserClaim>()
                 .HasIndex(uc => new { uc.UserId, uc.ClaimType })
                 .IsUnique();
+
+            modelBuilder.Entity<Department>().ToTable("Departments", "Visualizer");
+            modelBuilder.Entity<Teacher>().ToTable("Teachers", "Visualizer");
+            modelBuilder.Entity<Review>().ToTable("Reviews", "Shared");
+            modelBuilder.Entity<Reviewer>().ToTable("Reviewers", "Generator");
+            modelBuilder.Entity<Analyst>().ToTable("Analysts", "Visualizer");
+            modelBuilder.Entity<UserClaim>().ToTable("UserClaims", "auth");
         }
     }
 }

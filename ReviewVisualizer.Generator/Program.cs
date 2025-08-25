@@ -97,27 +97,28 @@ namespace GeneratorProject
             });
 
             builder.Services.AddDataProtection()
-            .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
-            .SetApplicationName("ReviewerVisualizer");
+               .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
+               .SetApplicationName("ReviewerVisualizer");
+
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.Cookie.Name = cookieSettings!.Name;
-                options.Cookie.Path = cookieSettings!.Path;
-                options.Cookie.SameSite = cookieSettings!.SameSite;
-                options.Cookie.SecurePolicy = cookieSettings!.Secure;
-                options.Cookie.HttpOnly = cookieSettings!.HttpOnly.HasFlag(HttpOnlyPolicy.Always);
-                options.Events.OnRedirectToLogin = context =>
+                .AddCookie(options =>
                 {
-                    context.Response.StatusCode = 401;
-                    return Task.CompletedTask;
-                };
-                options.Events.OnRedirectToAccessDenied = context =>
-                {
-                    context.Response.StatusCode = 403;
-                    return Task.CompletedTask;
-                };
-            });
+                    options.Cookie.Name = cookieSettings!.Name;
+                    options.Cookie.Path = cookieSettings!.Path;
+                    options.Cookie.SameSite = cookieSettings!.SameSite;
+                    options.Cookie.SecurePolicy = cookieSettings!.Secure;
+                    options.Cookie.HttpOnly = cookieSettings!.HttpOnly.HasFlag(HttpOnlyPolicy.Always);
+                    options.Events.OnRedirectToLogin = context =>
+                    {
+                        context.Response.StatusCode = 401;
+                        return Task.CompletedTask;
+                    };
+                    options.Events.OnRedirectToAccessDenied = context =>
+                    {
+                        context.Response.StatusCode = 403;
+                        return Task.CompletedTask;
+                    };
+                });
             builder.Services.AddAuthorizationPolicies()
                 .AddAuthorizationHandlers();
 
@@ -144,8 +145,8 @@ namespace GeneratorProject
                 app.UseDeveloperExceptionPage();
             else
                 app.UseExceptionHandler();
+            
             app.UseStatusCodePages();
-
 
             // Security middlewares.
             app.UseHttpsRedirection();
@@ -159,6 +160,7 @@ namespace GeneratorProject
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapHealthChecks("/health");
             app.MapControllers();
 
             app.UseHangfireDashboard(options: new DashboardOptions
@@ -169,8 +171,7 @@ namespace GeneratorProject
 
             app.UseSwagger();
             app.UseSwaggerUI();
-            app.MapHealthChecks("/health");
-
+            
             app.Run();
         }
     }

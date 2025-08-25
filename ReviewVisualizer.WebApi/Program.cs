@@ -36,6 +36,7 @@ namespace VisualizerProject
                 .CreateLogger();
 
             builder.Host.UseSerilog();
+            
             builder.Services.AddControllers(options =>
             {
                 options.RespectBrowserAcceptHeader = false;
@@ -46,7 +47,9 @@ namespace VisualizerProject
                 .AddXmlDataContractSerializerFormatters();
 
             builder.Services.AddEndpointsApiExplorer();
+            
             builder.Services.AddSwaggerGen();
+            
             builder.Services.AddCors(opt =>
             {
                 opt.AddDefaultPolicy(policy =>
@@ -66,6 +69,7 @@ namespace VisualizerProject
                     opts.EnableRetryOnFailure(SqlServerMaxRetriesOnFailureCount);
                 });
             }, ServiceLifetime.Scoped);
+            
             if (builder.Environment.IsDevelopment())
                 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -77,8 +81,8 @@ namespace VisualizerProject
             builder.Services.AddScoped<IAuthService, AuthService>();
 
             builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
-                .SetApplicationName("ReviewerVisualizer");
+               .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
+               .SetApplicationName("ReviewerVisualizer");
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -120,6 +124,8 @@ namespace VisualizerProject
 
             app.UseStatusCodePages();
 
+            app.MapHealthChecks("/health");
+
             app.UseHttpsRedirection();
             app.UseCors();
 
@@ -141,8 +147,7 @@ namespace VisualizerProject
             app.StartRatingCalculationEngine();
 
             app.AddAdminUser();
-            app.MapHealthChecks("/health");
-
+            
             app.Run();
         }
     }
