@@ -45,187 +45,187 @@ jobs:
       - name: Build 🧱
         run: dotnet build $PROJECT_PATH --configuration Release --no-restore
   
-  # unit-test:
-  #   name: Unit tests (for Generator Project)
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+  unit-test:
+    name: Unit tests (for Generator Project)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Set env variables
-  #       run: |
-  #         echo "TEST_PROJECT_PATH=ReviewVisualizer.Generator.Tests/ReviewVisualizer.Generator.Tests.csproj" >> $GITHUB_ENV
+      - name: Set env variables
+        run: |
+          echo "TEST_PROJECT_PATH=ReviewVisualizer.Generator.Tests/ReviewVisualizer.Generator.Tests.csproj" >> $GITHUB_ENV
           
-  #     - name: Prepare environment
-  #       uses: ./.github/workflows/actions/prepare-net-env
-  #       with:
-  #         os: ${{ env.OS }}
-  #         project_path: ${{ env.TEST_PROJECT_PATH }}
+      - name: Prepare environment
+        uses: ./.github/workflows/actions/prepare-net-env
+        with:
+          os: ${{ env.OS }}
+          project_path: ${{ env.TEST_PROJECT_PATH }}
       
-  #     - name: Run Unit Tests
-  #       id: testing-step
-  #       run: |
-  #         dotnet test $TEST_PROJECT_PATH \
-  #           --configuration Release \
-  #           --logger:"html;LogFileName=UnitTests.html" \
-  #           --collect:"XPlat Code Coverage"
+      - name: Run Unit Tests
+        id: testing-step
+        run: |
+          dotnet test $TEST_PROJECT_PATH \
+            --configuration Release \
+            --logger:"html;LogFileName=UnitTests.html" \
+            --collect:"XPlat Code Coverage"
       
-  #     - name: Upload unit test report on tests failure
-  #       if: failure() && steps.testing-step.outcome == 'failure'
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: unit-test-report
-  #         path: ReviewVisualizer.Generator.Tests/TestResults/UnitTests.html
+      - name: Upload unit test report on tests failure
+        if: failure() && steps.testing-step.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: ReviewVisualizer.Generator.Tests/TestResults/UnitTests.html
       
-  #     - name: Install ReportGenerator
-  #       if: always()
-  #       id: install-reportgenerator
-  #       run: dotnet tool install -g dotnet-reportgenerator-globaltool
+      - name: Install ReportGenerator
+        if: always()
+        id: install-reportgenerator
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
       
-  #     - name: Generate user-friendly coverage report
-  #       if: steps.install-reportgenerator.outcome == 'success'
-  #       id: generate-coverage-report
-  #       run: reportgenerator -reports:"ReviewVisualizer.Generator.Tests/TestResults/*/coverage.cobertura.xml" -targetdir:"coveragereport"  -reporttypes:Html
+      - name: Generate user-friendly coverage report
+        if: steps.install-reportgenerator.outcome == 'success'
+        id: generate-coverage-report
+        run: reportgenerator -reports:"ReviewVisualizer.Generator.Tests/TestResults/*/coverage.cobertura.xml" -targetdir:"coveragereport"  -reporttypes:Html
       
-  #     - name: Upload Html Coverage Report
-  #       if: steps.generate-coverage-report.outcome == 'success'
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: coverage-report
-  #         path: coveragereport
+      - name: Upload Html Coverage Report
+        if: steps.generate-coverage-report.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coveragereport
 
-  # integartion-test:
-  #   needs: unit-test
-  #   runs-on: ubuntu-latest
-  #   services:
-  #     mssql:
-  #       image: mcr.microsoft.com/mssql/server:2022-latest
-  #       ports:
-  #         - 1433:1433
-  #       env:
-  #         SA_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
-  #         ACCEPT_EULA: "Y"
-  #   env:
-  #     CONNECTION_STRING: Server=localhost,1433;Database=IntegrationTestDb;User ID=sa;Password=${{ secrets.TEST_DB_PASSWORD }};TrustServerCertificate=True;
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+  integartion-test:
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+          - 1433:1433
+        env:
+          SA_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          ACCEPT_EULA: "Y"
+    env:
+      CONNECTION_STRING: Server=localhost,1433;Database=IntegrationTestDb;User ID=sa;Password=${{ secrets.TEST_DB_PASSWORD }};TrustServerCertificate=True;
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  #     - name: Set env variables
-  #       run: |
-  #         echo "DATA_PROJECT_PATH=ReviewVisualizer.Data/ReviewVisualizer.Data.csproj" >> $GITHUB_ENV
-  #         echo "STARTUP_PROJECT_PATH=ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.csproj" >> $GITHUB_ENV
-  #         echo "INTEGRATION_TESTS_PROJECT_PATH=ReviewVisualizer.Generator.IntegrationTests/ReviewVisualizer.Generator.IntegrationTests.csproj" >> $GITHUB_ENV
+      - name: Set env variables
+        run: |
+          echo "DATA_PROJECT_PATH=ReviewVisualizer.Data/ReviewVisualizer.Data.csproj" >> $GITHUB_ENV
+          echo "STARTUP_PROJECT_PATH=ReviewVisualizer.WebApi/ReviewVisualizer.WebApi.csproj" >> $GITHUB_ENV
+          echo "INTEGRATION_TESTS_PROJECT_PATH=ReviewVisualizer.Generator.IntegrationTests/ReviewVisualizer.Generator.IntegrationTests.csproj" >> $GITHUB_ENV
           
-  #     - name: Prepare environment
-  #       uses: ./.github/workflows/actions/prepare-net-env
-  #       with:
-  #         os: ${{ env.OS }}
-  #         project-path: ${{ env.TEST_PROJECT_PATH }}
+      - name: Prepare environment
+        uses: ./.github/workflows/actions/prepare-net-env
+        with:
+          os: ${{ env.OS }}
+          project-path: ${{ env.TEST_PROJECT_PATH }}
       
-  #     - name: Install dotnet-ef
-  #       run: dotnet tool install --global dotnet-ef
+      - name: Install dotnet-ef
+        run: dotnet tool install --global dotnet-ef
       
-  #     - name: Apply EF Core migrations
-  #       run: |
-  #         dotnet ef database update --project $DATA_PROJECT_PATH \
-  #         --startup-project $STARTUP_PROJECT_PATH \
-  #         --connection "$CONNECTION_STRING"
+      - name: Apply EF Core migrations
+        run: |
+          dotnet ef database update --project $DATA_PROJECT_PATH \
+          --startup-project $STARTUP_PROJECT_PATH \
+          --connection "$CONNECTION_STRING"
       
-  #     - name: Run integration tests
-  #       id: testing-step
-  #       run: |
-  #         dotnet test $INTEGRATION_TESTS_PROJECT_PATH \
-  #           --configuration Release \
-  #           --logger:"html;LogFileName=IntegrationTests.html" \
-  #       env:
-  #         ConnectionStrings__DefaultConnection: "${{ env.CONNECTION_STRING }}"
+      - name: Run integration tests
+        id: testing-step
+        run: |
+          dotnet test $INTEGRATION_TESTS_PROJECT_PATH \
+            --configuration Release \
+            --logger:"html;LogFileName=IntegrationTests.html" \
+        env:
+          ConnectionStrings__DefaultConnection: "${{ env.CONNECTION_STRING }}"
       
-  #     - name: Upload integration test report on tests failure
-  #       if: failure() && steps.testing-step.outcome == 'failure'
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: unit-test-report
-  #         path: ReviewVisualizer.Generator.IntegrationTests/TestResults/IntegrationTests.html
+      - name: Upload integration test report on tests failure
+        if: failure() && steps.testing-step.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: ReviewVisualizer.Generator.IntegrationTests/TestResults/IntegrationTests.html
 
-  # megalinter-code-quality-check:
-  #   needs: lint
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
+  megalinter-code-quality-check:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       
-  #     - name: Run code quality check
-  #       continue-on-error: true
-  #       uses: oxsecurity/megalinter@v8
-  #       env:
-  #         VALIDATE_ALL_CODEBASE: >-
-  #           ${{
-  #             github.event_name == 'push' &&
-  #             contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
-  #           }}
+      - name: Run code quality check
+        continue-on-error: true
+        uses: oxsecurity/megalinter@v8
+        env:
+          VALIDATE_ALL_CODEBASE: >-
+            ${{
+              github.event_name == 'push' &&
+              contains(fromJSON('["refs/heads/main", "refs/heads/master"]'), github.ref)
+            }}
 
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  #     - name: Upload MegaLinter artifacts artifacts
-  #       if: success() || failure()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: code-quality-reports
-  #         include-hidden-files: "true"
-  #         path: |
-  #           megalinter-reports
-  #           mega-linter.log
+      - name: Upload MegaLinter artifacts artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-quality-reports
+          include-hidden-files: "true"
+          path: |
+            megalinter-reports
+            mega-linter.log
 
-  # dependency-vulnerabilities-check:
-  #   runs-on: ubuntu-latest
-  #   needs: lint
-  #   env:
-  #     PROG_LANG: csharp
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
+  dependency-vulnerabilities-check:
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      PROG_LANG: csharp
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  #     - name: Setup .NET
-  #       uses: actions/setup-dotnet@v4
-  #       with:
-  #         dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
-  #     - name: Restore .NET dependencies
-  #       run: dotnet restore
+      - name: Restore .NET dependencies
+        run: dotnet restore
 
-  #     # Cache DC’s vulnerability DB to speed up runs
-  #     - name: Cache Dependency-Check DB
-  #       uses: actions/cache@v4
-  #       with:
-  #         path: ~/.dependency-check
-  #         key: dc-db-${{ runner.os }}-v9-${{ github.run_id }}
-  #         restore-keys: |
-  #           dc-db-${{ runner.os }}-v9-
+      # Cache DC’s vulnerability DB to speed up runs
+      - name: Cache Dependency-Check DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.dependency-check
+          key: dc-db-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            dc-db-${{ runner.os }}-
 
-  #     - name: Run OWASP Dependency-Check (HTML)
-  #       continue-on-error: true
-  #       uses: dependency-check/Dependency-Check_Action@main
-  #       with:
-  #         scan: .
-  #         out: dependency-check-report
-  #         format: HTML
-  #         project: ${{ github.repository }}-${{ github.ref_name }}
-  #         args: >
-  #           --failOnCVSS 7
-  #           --enableRetired
-  #         data-directory: ~/.dependency-check
+      - name: Run OWASP Dependency-Check (HTML)
+        continue-on-error: true
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          scan: .
+          out: dependency-check-report
+          format: HTML
+          project: ${{ github.repository }}-${{ github.ref_name }}
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+          data-directory: ~/.dependency-check
 
-  #     - name: Upload HTML report
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: dependency-check-report
-  #         path: dependency-check-report/*.html
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: dependency-check-report/*.html
 
   publish:
-    #needs: [integartion-test, megalinter-code-quality-check, dependency-vulnerabilities-check]
+    needs: [integartion-test, megalinter-code-quality-check, dependency-vulnerabilities-check]
     strategy:
       matrix:
         project: ['Generator','WebApi']
