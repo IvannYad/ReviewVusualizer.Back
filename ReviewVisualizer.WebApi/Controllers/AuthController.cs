@@ -29,20 +29,26 @@ namespace ReviewVisualizer.WebApi.Controllers
             if (loginRequest is null)
                 return BadRequest("Login data is not provided");
 
-            if (loginRequest.Username == "123123123")
-            {
-                return Ok();
-            }
-
             try
             {
                 var principal = await _authService.LoginAsync(loginRequest).ConfigureAwait(false);
+
+                if (loginRequest.Username == "1111")
+                {
+                    return Ok();
+                }
+
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                     new AuthenticationProperties
                     {
                         IsPersistent = true,
                         ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
                     }).ConfigureAwait(false);
+
+                if (loginRequest.Username == "2222")
+                {
+                    return Ok();
+                }
 
                 HttpContext.Response.Cookies.Append(
                     "UserName",
@@ -61,10 +67,6 @@ namespace ReviewVisualizer.WebApi.Controllers
             catch (UserUnauthenticatedException ex)
             {
                 return Unauthorized(new LoginResponse(false, ex.Message));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
             }
         }
 
