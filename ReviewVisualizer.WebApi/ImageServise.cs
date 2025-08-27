@@ -16,7 +16,7 @@ namespace VisualizerProject
 
         public async Task<string> UploadImageAsync(IFormFile image)
         {
-            var imageName = $"departments_{Guid.NewGuid()}.{Path.GetExtension(image.FileName).ToLowerInvariant()}";
+            var imageName = $"departments_{Guid.NewGuid()}{Path.GetExtension(image.FileName).ToLowerInvariant()}";
 
             if (_builder.Environment.IsProduction())
             {
@@ -88,9 +88,12 @@ namespace VisualizerProject
                     new BlobServiceClient(_builder.Configuration["ImagesStorage:Url"]);
 
             var containerClient = blobServiceClient.GetBlobContainerClient(_builder.Configuration["ImagesStorage:ContainerName"]);
-            await containerClient.CreateIfNotExistsAsync();
+            
+            var response = await containerClient.CreateIfNotExistsAsync();
+            if (response != null)
+            {
             await containerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
-
+            }
 
             var blobClient = containerClient.GetBlobClient(imageName);
 
