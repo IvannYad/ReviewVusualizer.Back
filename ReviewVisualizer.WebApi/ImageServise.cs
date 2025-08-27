@@ -88,11 +88,11 @@ namespace VisualizerProject
                     new BlobServiceClient(_builder.Configuration["ImagesStorage:Url"]);
 
             var containerClient = blobServiceClient.GetBlobContainerClient(_builder.Configuration["ImagesStorage:ContainerName"]);
-            
+
             var response = await containerClient.CreateIfNotExistsAsync();
             if (response != null)
             {
-            await containerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
+                await containerClient.SetAccessPolicyAsync(Azure.Storage.Blobs.Models.PublicAccessType.Blob);
             }
 
             var blobClient = containerClient.GetBlobClient(imageName);
