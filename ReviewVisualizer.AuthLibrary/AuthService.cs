@@ -63,8 +63,6 @@ namespace ReviewVisualizer.WebApi.Services
                     new Claim(ClaimTypes.Name, user.UserName)
                 };
 
-                throw new UserUnauthenticatedException(request.Username, request.Password, new Exception("papapapappa"));
-
                 claims.AddRange(user.Claims.Select(c => new Claim(c.ClaimType, c.ClaimValue)));
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

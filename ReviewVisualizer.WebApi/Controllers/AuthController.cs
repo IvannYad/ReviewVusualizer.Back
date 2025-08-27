@@ -56,6 +56,10 @@ namespace ReviewVisualizer.WebApi.Controllers
             }
             catch (UserUnauthenticatedException ex)
             {
+                return Unauthorized(new LoginResponse(false, ex.Message));
+            }
+            catch (Exception ex)
+            {
                 return Unauthorized(new LoginResponse(false, ex.ToString()));
             }
         }
