@@ -8,7 +8,7 @@ using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
-using System.Drawing;
+using VisualizerProject;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -16,15 +16,14 @@ namespace ReviewVisualizer.WebApi.Controllers
     [Route("departments")]
     public class DepartmentController : ControllerBase
     {
-        private string[] permittedPhotoExtensions = { ".png", ".jpg" };
-
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
-        private readonly string _imagesStoragePath;
+        private readonly ImageService _imageService;
 
-        public DepartmentController(IConfiguration configuration, ApplicationDbContext dbContext, IMapper mapper)
+        public DepartmentController(IConfiguration configuration, ApplicationDbContext dbContext, IMapper mapper
+            , ImageService imageService)
         {
-            _imagesStoragePath = configuration.GetValue<string>("ImagesStorage");
+            _imageService = imageService;
             _dbContext = ApplicationDbContext.CreateNew(dbContext);
             _mapper = mapper;
         }
@@ -59,18 +58,12 @@ namespace ReviewVisualizer.WebApi.Controllers
 
         [HttpPost("upload-image")]
         [Authorize(Policy = Policies.RequireAnalyst)]
-        public IActionResult UploadImage([FromForm] IFormFile deptIcon)
+        public async Task<IActionResult> UploadImageAsync([FromForm] IFormFile deptIcon)
         {
-            var ext = Path.GetExtension(deptIcon.FileName).ToLowerInvariant();
-            if (string.IsNullOrEmpty(ext) || !permittedPhotoExtensions.Contains(ext))
+            if (!_imageService.ValidateImage(deptIcon))
                 return BadRequest("Invalid photo file extension");
 
-            string name = $"departments_{Guid.NewGuid()}_{deptIcon.FileName}";
-            using var memoryStream = new MemoryStream();
-            deptIcon.CopyTo(memoryStream);
-
-            Image image = Image.FromStream(memoryStream);
-            image.Save(Path.Combine(_imagesStoragePath, name), System.Drawing.Imaging.ImageFormat.Png);
+            string name = await _imageService.UploadImageAsync(deptIcon);
 
             return new ContentResult()
             {
@@ -81,14 +74,9 @@ namespace ReviewVisualizer.WebApi.Controllers
 
         [HttpPost("delete-image")]
         [Authorize(Policy = Policies.RequireAnalyst)]
-        public IActionResult DeleteImage([FromQuery] string imgName)
+        public async Task<IActionResult> DeleteImageAsync([FromQuery] string imgName)
         {
-            string imgFullPath = Path.Combine(_imagesStoragePath, imgName);
-            if (System.IO.File.Exists(imgFullPath))
-            {
-                System.IO.File.Delete(imgFullPath);
-            }
-
+            await _imageService.DeleteImageAsync(imgName);
             return Ok();
         }
 

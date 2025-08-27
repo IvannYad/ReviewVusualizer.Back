@@ -9,6 +9,7 @@ using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
 using System.Drawing;
+using VisualizerProject;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -20,12 +21,13 @@ namespace ReviewVisualizer.WebApi.Controllers
 
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
-        private readonly string _imagesStoragePath;
         private static object _lock = new object();
+        private readonly ImageService _imageService;
 
-        public TeacherController(IConfiguration configuration, ApplicationDbContext dbContext, IMapper mapper)
+        public TeacherController(IConfiguration configuration, ApplicationDbContext dbContext, IMapper mapper
+            , ImageService imageService)
         {
-            _imagesStoragePath = configuration.GetValue<string>("ImagesStorage");
+            _imageService = imageService;
             _dbContext = ApplicationDbContext.CreateNew(dbContext);
             _mapper = mapper;
         }
@@ -80,7 +82,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         [HttpDelete()]
         [Produces("application/json")]
         [Authorize(Policy = Policies.RequireAnalyst)]
-        public IActionResult Delete([FromQuery] int teacherId)
+        public async Task<IActionResult> DeleteAsync([FromQuery] int teacherId)
         {
             Teacher? teacher = _dbContext.Teachers.FirstOrDefault(t => t.Id == teacherId);
             if (teacher is null)
@@ -93,7 +95,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                 Review[] reviews = _dbContext.Reviews.Where(r => r.TeacherId == teacher.Id).ToArray();
                 _dbContext.Reviews.RemoveRange(reviews);
 
-                DeleteImage(teacher.PhotoUrl);
+                DeleteImageAsync(teacher.PhotoUrl).GetAwaiter().GetResult();
                 _dbContext.Teachers.Remove(teacher);
                 _dbContext.SaveChanges();
             }
@@ -104,19 +106,12 @@ namespace ReviewVisualizer.WebApi.Controllers
         [HttpPost("upload-image")]
         [Produces("application/json")]
         [Authorize(Policy = Policies.RequireAnalyst)]
-        public IActionResult UploadImage([FromForm] IFormFile deptIcon)
+        public async Task<IActionResult> UploadImageAsync([FromForm] IFormFile deptIcon)
         {
-            var ext = Path.GetExtension(deptIcon.FileName).ToLowerInvariant();
-            if (string.IsNullOrEmpty(ext) || !permittedPhotoExtensions.Contains(ext))
+            if (!_imageService.ValidateImage(deptIcon))
                 return BadRequest("Invalid photo file extension");
 
-            // Generate new image name. Cannot use name supplied by used due to security reasons.
-            string name = $"teachers_{Guid.NewGuid()}_{deptIcon.FileName}";
-            using var memoryStream = new MemoryStream();
-            deptIcon.CopyTo(memoryStream);
-
-            Image image = Image.FromStream(memoryStream);
-            image.Save(Path.Combine(_imagesStoragePath, name), System.Drawing.Imaging.ImageFormat.Png);
+            string name = await _imageService.UploadImageAsync(deptIcon);
 
             return Ok(name);
         }
@@ -124,14 +119,9 @@ namespace ReviewVisualizer.WebApi.Controllers
         [HttpPost("delete-image")]
         [Produces("application/json")]
         [Authorize(Policy = Policies.RequireAnalyst)]
-        public IActionResult DeleteImage([FromQuery] string imgName)
+        public async Task<IActionResult> DeleteImageAsync([FromQuery] string imgName)
         {
-            string imgFullPath = Path.Combine(_imagesStoragePath, imgName);
-            if (System.IO.File.Exists(imgFullPath))
-            {
-                System.IO.File.Delete(imgFullPath);
-            }
-
+            await _imageService.DeleteImageAsync(imgName);
             return Ok();
         }
 

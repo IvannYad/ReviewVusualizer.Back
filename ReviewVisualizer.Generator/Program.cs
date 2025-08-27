@@ -96,9 +96,7 @@ namespace GeneratorProject
                 });
             });
 
-            builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
-               .SetApplicationName("ReviewerVisualizer");
+            builder.AddDataProtection();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

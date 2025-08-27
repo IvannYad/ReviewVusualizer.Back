@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
@@ -73,16 +74,13 @@ namespace VisualizerProject
             if (builder.Environment.IsDevelopment())
                 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            //builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>();
-            //builder.Services.AddSingleton<IProcessorHost, ProcessorHost>();
             builder.Services.AddAutoMapper(typeof(MyMapper));
 
+            builder.Services.AddScoped<ImageService>();
             builder.Services.AddScoped(_ => new PasswordService(builder.Configuration["PasswordSecret"] ?? string.Empty));
             builder.Services.AddScoped<IAuthService, AuthService>();
 
-            builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Users\iyadc\OneDrive - SoftServe, Inc\Desktop\it\PeEx\Middle\ReviewVisualizer\persist-keys"))
-               .SetApplicationName("ReviewerVisualizer");
+            builder.AddDataProtection();
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
