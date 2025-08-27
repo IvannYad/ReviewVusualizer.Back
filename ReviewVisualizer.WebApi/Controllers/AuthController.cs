@@ -39,7 +39,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                         IsPersistent = true,
                         ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
                     }).ConfigureAwait(false);
-                
+
                 HttpContext.Response.Cookies.Append(
                     "UserName",
                     loginRequest.Username,
