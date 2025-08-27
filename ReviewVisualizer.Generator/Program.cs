@@ -163,7 +163,8 @@ namespace GeneratorProject
 
             app.UseHangfireDashboard(options: new DashboardOptions
             {
-                DashboardTitle = "Reviews processing dashboard"
+                DashboardTitle = "Reviews processing dashboard",
+                Authorization = [new AllowAllDashboardAuthorizationFilter()],
             });
             app.MapHangfireDashboard();
 
