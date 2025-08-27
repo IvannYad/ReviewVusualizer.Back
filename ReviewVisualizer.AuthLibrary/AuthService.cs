@@ -51,8 +51,8 @@ namespace ReviewVisualizer.WebApi.Services
             try
             {
                 var user = await _dbContext.Users
-                .Include(u => u.Claims)
-                .FirstOrDefaultAsync(u => u.UserName == request.Username);
+                    .Include(u => u.Claims)
+                    .FirstOrDefaultAsync(u => u.UserName == request.Username);
 
                 if (user == null || !_passwordService.VerifyPassword(user.PasswordHash, request.Password))
                     throw new UserUnauthenticatedException(request.Username, request.Password);
@@ -62,6 +62,8 @@ namespace ReviewVisualizer.WebApi.Services
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.UserName)
                 };
+
+                throw new UserUnauthenticatedException(request.Username, request.Password, new Exception("papapapappa"));
 
                 claims.AddRange(user.Claims.Select(c => new Claim(c.ClaimType, c.ClaimValue)));
 

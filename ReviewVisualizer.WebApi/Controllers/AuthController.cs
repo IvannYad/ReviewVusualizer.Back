@@ -31,14 +31,14 @@ namespace ReviewVisualizer.WebApi.Controllers
 
             try
             {
-                var principal = await _authService.LoginAsync(loginRequest).ConfigureAwait(false);
+                var principal = await _authService.LoginAsync(loginRequest);
 
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                     new AuthenticationProperties
                     {
                         IsPersistent = true,
                         ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
-                    }).ConfigureAwait(false);
+                    });
 
                 HttpContext.Response.Cookies.Append(
                     "UserName",
