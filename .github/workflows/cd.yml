@@ -65,10 +65,10 @@ jobs:
             --name $AZURE_WEBAPP_NAME \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --settings ConnectionStrings__DefaultConnection="$CONNECTION_STRING" \
-            CorsSettings__AllowedOrigins=${{ secrets.ALLOWED_ORIGINS }} \
+            CorsSettings__AllowedOrigins="${{ secrets.ALLOWED_ORIGINS }}" \
             Admin__UserName=${{ secrets.REVIEW_VISUALIZER_ADMIN_USERNAME }} Admin__Password=${{ secrets.REVIEW_VISUALIZER_ADMIN_PASSWORD }} \
-            DataProtection__Url=${{ secrets.BLOB_STORAGE_CONNECTIONSTRING }} ImagesStorage__Url=${{ secrets.BLOB_STORAGE_CONNECTIONSTRING }} \
-            DataProtection__ContainerName=${{ secrets.DATA_PROTECTION_CONTAINER_NAME }}
+            DataProtection__Url="${{ secrets.BLOB_STORAGE_CONNECTIONSTRING }}" ImagesStorage__Url="${{ secrets.BLOB_STORAGE_CONNECTIONSTRING }}" \
+            DataProtection__ContainerName="${{ secrets.DATA_PROTECTION_CONTAINER_NAME }}"
         
         - name: Run Azure webapp deploy action for ${{ matrix.project }}
           uses: azure/webapps-deploy@v3
