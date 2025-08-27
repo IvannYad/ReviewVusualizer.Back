@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.AuthLibrary.Exceptions;
@@ -55,6 +56,10 @@ namespace ReviewVisualizer.WebApi.Controllers
             catch (UserUnauthenticatedException ex)
             {
                 return Unauthorized(new LoginResponse(false, ex.Message));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
             }
         }
 
