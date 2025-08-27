@@ -76,7 +76,7 @@ namespace VisualizerProject
 
             builder.Services.AddAutoMapper(typeof(MyMapper));
 
-            builder.Services.AddScoped<ImageService>();
+            builder.Services.AddScoped(_ => new ImageService(builder));
             builder.Services.AddScoped(_ => new PasswordService(builder.Configuration["PasswordSecret"] ?? string.Empty));
             builder.Services.AddScoped<IAuthService, AuthService>();
 
