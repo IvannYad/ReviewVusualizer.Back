@@ -29,38 +29,40 @@ namespace ReviewVisualizer.WebApi.Controllers
             if (loginRequest is null)
                 return BadRequest("Login data is not provided");
 
-            try
-            {
-                var principal = await _authService.LoginAsync(loginRequest).ConfigureAwait(false);
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                    new AuthenticationProperties
-                    {
-                        IsPersistent = true,
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
-                    }).ConfigureAwait(false);
+            //try
+            //{
+            //    var principal = await _authService.LoginAsync(loginRequest).ConfigureAwait(false);
+            //    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+            //        new AuthenticationProperties
+            //        {
+            //            IsPersistent = true,
+            //            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+            //        }).ConfigureAwait(false);
 
-                HttpContext.Response.Cookies.Append(
-                    "UserName",
-                    loginRequest.Username,
-                    new CookieOptions
-                    {
-                        Expires = DateTimeOffset.UtcNow.AddHours(1),
-                        HttpOnly = false,
-                        Secure = true,
-                        SameSite = SameSiteMode.Strict,
-                        IsEssential = true // important if you use cookie consent
-                    });
+            //    HttpContext.Response.Cookies.Append(
+            //        "UserName",
+            //        loginRequest.Username,
+            //        new CookieOptions
+            //        {
+            //            Expires = DateTimeOffset.UtcNow.AddHours(1),
+            //            HttpOnly = false,
+            //            Secure = true,
+            //            SameSite = SameSiteMode.Strict,
+            //            IsEssential = true // important if you use cookie consent
+            //        });
 
-                return Ok(new LoginResponse(true));
-            }
-            catch (UserUnauthenticatedException ex)
-            {
-                return Unauthorized(new LoginResponse(false, ex.Message));
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
+            //    return Ok(new LoginResponse(true));
+            //}
+            //catch (UserUnauthenticatedException ex)
+            //{
+            //    return Unauthorized(new LoginResponse(false, ex.Message));
+            //}
+            //catch (Exception e)
+            //{
+            //    return BadRequest(e);
+            //}
+
+            return Ok();
         }
 
         [HttpPost("register")]
