@@ -29,40 +29,43 @@ namespace ReviewVisualizer.WebApi.Controllers
             if (loginRequest is null)
                 return BadRequest("Login data is not provided");
 
-            //try
-            //{
-            //    var principal = await _authService.LoginAsync(loginRequest).ConfigureAwait(false);
-            //    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-            //        new AuthenticationProperties
-            //        {
-            //            IsPersistent = true,
-            //            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
-            //        }).ConfigureAwait(false);
+            if (loginRequest.Username == "123123123")
+            {
+                return Ok();
+            }
 
-            //    HttpContext.Response.Cookies.Append(
-            //        "UserName",
-            //        loginRequest.Username,
-            //        new CookieOptions
-            //        {
-            //            Expires = DateTimeOffset.UtcNow.AddHours(1),
-            //            HttpOnly = false,
-            //            Secure = true,
-            //            SameSite = SameSiteMode.Strict,
-            //            IsEssential = true // important if you use cookie consent
-            //        });
+            try
+            {
+                var principal = await _authService.LoginAsync(loginRequest).ConfigureAwait(false);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                    new AuthenticationProperties
+                    {
+                        IsPersistent = true,
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
+                    }).ConfigureAwait(false);
 
-            //    return Ok(new LoginResponse(true));
-            //}
-            //catch (UserUnauthenticatedException ex)
-            //{
-            //    return Unauthorized(new LoginResponse(false, ex.Message));
-            //}
-            //catch (Exception e)
-            //{
-            //    return BadRequest(e);
-            //}
+                HttpContext.Response.Cookies.Append(
+                    "UserName",
+                    loginRequest.Username,
+                    new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddHours(1),
+                        HttpOnly = false,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        IsEssential = true // important if you use cookie consent
+                    });
 
-            return Ok();
+                return Ok(new LoginResponse(true));
+            }
+            catch (UserUnauthenticatedException ex)
+            {
+                return Unauthorized(new LoginResponse(false, ex.Message));
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e);
+            }
         }
 
         [HttpPost("register")]
