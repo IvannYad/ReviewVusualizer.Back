@@ -72,8 +72,7 @@ namespace ReviewVisualizer.WebApi.Services
             }
             catch (Exception ex)
             {
-                await Console.Out.WriteLineAsync($"Exception ocurred during logging in: {ex}");
-                throw;
+                throw new UserUnauthenticatedException(request.Username, request.Password, ex);
             }
         }
     }
