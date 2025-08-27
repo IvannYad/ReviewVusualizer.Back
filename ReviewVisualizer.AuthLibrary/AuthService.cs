@@ -48,25 +48,33 @@ namespace ReviewVisualizer.WebApi.Services
 
         public async Task<ClaimsPrincipal> LoginAsync(LoginRequest request)
         {
-            var user = await _dbContext.Users
+            try
+            {
+                var user = await _dbContext.Users
                 .Include(u => u.Claims)
                 .FirstOrDefaultAsync(u => u.UserName == request.Username);
 
-            if (user == null || !_passwordService.VerifyPassword(user.PasswordHash, request.Password))
-                throw new UserUnauthenticatedException(request.Username, request.Password);
+                if (user == null || !_passwordService.VerifyPassword(user.PasswordHash, request.Password))
+                    throw new UserUnauthenticatedException(request.Username, request.Password);
 
-            var claims = new List<Claim>
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.UserName)
+                };
+
+                claims.AddRange(user.Claims.Select(c => new Claim(c.ClaimType, c.ClaimValue)));
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+
+                return principal;
+            }
+            catch (Exception ex)
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
-            };
-
-            claims.AddRange(user.Claims.Select(c => new Claim(c.ClaimType, c.ClaimValue)));
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-
-            return principal;
+                await Console.Out.WriteLineAsync($"Exception ocurred during logging in: {ex}");
+                throw;
+            }
         }
     }
 }
