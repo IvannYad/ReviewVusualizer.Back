@@ -14,7 +14,7 @@ namespace ReviewVisualizer.AuthLibrary
         {
             if (string.IsNullOrWhiteSpace(AllowedOrigins))
                 return Array.Empty<string>();
-            
+
             return AllowedOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries)
                 .Select(o => o.Trim())
                 .Where(o => !string.IsNullOrWhiteSpace(o))
