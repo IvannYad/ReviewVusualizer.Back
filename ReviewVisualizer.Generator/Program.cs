@@ -25,8 +25,12 @@ namespace GeneratorProject
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            var cookieSettings = builder.Configuration
+            var authCookieSettings = builder.Configuration
                 .GetSection("AuthCookieSettings")
+                .Get<CookieSettings>();
+
+            var cookiesSettings = builder.Configuration
+                .GetSection("CookiesSettings")
                 .Get<CookieSettings>();
 
             var corsSettings = builder.Configuration
@@ -101,11 +105,11 @@ namespace GeneratorProject
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.Cookie.Name = cookieSettings!.Name;
-                    options.Cookie.Path = cookieSettings!.Path;
-                    options.Cookie.SameSite = cookieSettings!.SameSite;
-                    options.Cookie.SecurePolicy = cookieSettings!.Secure;
-                    options.Cookie.HttpOnly = cookieSettings!.HttpOnly.HasFlag(HttpOnlyPolicy.Always);
+                    options.Cookie.Name = authCookieSettings!.Name;
+                    options.Cookie.Path = authCookieSettings!.Path;
+                    options.Cookie.SameSite = authCookieSettings!.SameSite;
+                    options.Cookie.SecurePolicy = authCookieSettings!.Secure;
+                    options.Cookie.HttpOnly = authCookieSettings!.HttpOnly.HasFlag(HttpOnlyPolicy.Always);
                     options.Events.OnRedirectToLogin = context =>
                     {
                         context.Response.StatusCode = 401;
@@ -151,9 +155,9 @@ namespace GeneratorProject
             app.UseCors();
             app.UseCookiePolicy(new CookiePolicyOptions()
             {
-                MinimumSameSitePolicy = cookieSettings!.SameSite,
-                HttpOnly = cookieSettings!.HttpOnly,
-                Secure = cookieSettings!.Secure,
+                MinimumSameSitePolicy = cookiesSettings!.SameSite,
+                HttpOnly = cookiesSettings!.HttpOnly,
+                Secure = cookiesSettings!.Secure,
             });
             app.UseAuthentication();
             app.UseAuthorization();
