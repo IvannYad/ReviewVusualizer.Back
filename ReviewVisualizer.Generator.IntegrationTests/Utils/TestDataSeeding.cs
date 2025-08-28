@@ -119,14 +119,14 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                 {
                     User = user,
                     ClaimType = ClaimTypes.SystemRole.GetClaimType(),
-                    ClaimValue = SystemRoles.Visitor.ToString(),
+                    ClaimValue = Convert.ToInt32(SystemRoles.Visitor).ToString(),
                 }],
 
                 TestUser.Analyst => [new UserClaim()
                 {
                     User = user,
                     ClaimType = ClaimTypes.SystemRole.GetClaimType(),
-                    ClaimValue = SystemRoles.Analyst.ToString(),
+                    ClaimValue = Convert.ToInt32(SystemRoles.Analyst).ToString(),
                 }],
 
                 TestUser.GeneratorAdmin_FireAndForget => [
@@ -134,13 +134,13 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                     {
                         User = user,
                         ClaimType = ClaimTypes.SystemRole.GetClaimType(),
-                        ClaimValue = SystemRoles.GeneratorAdmin.ToString(),
+                        ClaimValue = Convert.ToInt32(SystemRoles.GeneratorAdmin).ToString(),
                     },
                     new UserClaim()
                     {
                         User = user,
                         ClaimType = ClaimTypes.GeneratorModifications.GetClaimType(),
-                        ClaimValue = GeneratorModifications.ModifyFireAndForget.ToString(),
+                        ClaimValue = Convert.ToInt32(GeneratorModifications.ModifyFireAndForget).ToString(),
                     },
                 ],
 
@@ -149,13 +149,13 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                     {
                         User = user,
                         ClaimType = ClaimTypes.SystemRole.GetClaimType(),
-                        ClaimValue = SystemRoles.GeneratorAdmin.ToString(),
+                        ClaimValue = Convert.ToInt32(SystemRoles.GeneratorAdmin).ToString(),
                     },
                     new UserClaim()
                     {
                         User = user,
                         ClaimType = ClaimTypes.GeneratorModifications.GetClaimType(),
-                        ClaimValue = GeneratorModifications.ModifyDelayed.ToString(),
+                        ClaimValue = Convert.ToInt32(GeneratorModifications.ModifyDelayed).ToString(),
                     },
                 ],
 
@@ -164,13 +164,13 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                     {
                         User = user,
                         ClaimType = ClaimTypes.SystemRole.GetClaimType(),
-                        ClaimValue = SystemRoles.GeneratorAdmin.ToString(),
+                        ClaimValue = Convert.ToInt32(SystemRoles.GeneratorAdmin).ToString(),
                     },
                     new UserClaim()
                     {
                         User = user,
                         ClaimType = ClaimTypes.GeneratorModifications.GetClaimType(),
-                        ClaimValue = GeneratorModifications.ModifyRecurring.ToString(),
+                        ClaimValue = Convert.ToInt32(GeneratorModifications.ModifyRecurring).ToString(),
                     },
                 ],
 
@@ -178,14 +178,14 @@ namespace ReviewVisualizer.Generator.IntegrationTests.Utils
                 {
                     User = user,
                     ClaimType = ClaimTypes.SystemRole.GetClaimType(),
-                    ClaimValue = SystemRoles.Owner.ToString(),
+                    ClaimValue = Convert.ToInt32(SystemRoles.Owner).ToString(),
                 }],
 
                 _ => [new UserClaim()
                 {
                     User = user,
                     ClaimType = ClaimTypes.SystemRole.GetClaimType(),
-                    ClaimValue = SystemRoles.None.ToString(),
+                    ClaimValue = Convert.ToInt32(SystemRoles.None).ToString(),
                 }],
             };
         }

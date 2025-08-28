@@ -53,7 +53,7 @@ namespace ReviewVisualizer.WebApi
                         new UserClaim
                         {
                             ClaimType = ClaimTypes.SystemRole.GetClaimType(),
-                            ClaimValue = SystemRoles.Owner.ToString(),
+                            ClaimValue = Convert.ToInt32(SystemRoles.Owner).ToString(),
                         }
                     }
                 };
