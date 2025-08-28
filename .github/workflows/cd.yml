@@ -70,6 +70,7 @@ jobs:
             DataProtection__Url="${{ secrets.BLOB_STORAGE_CONNECTIONSTRING }}" ImagesStorage__Url="${{ secrets.BLOB_STORAGE_CONNECTIONSTRING }}" \
             DataProtection__ContainerName="${{ secrets.DATA_PROTECTION_CONTAINER_NAME }}" \
             AuthCookieSettings__Domain="${{ vars.REVIEW_VISUALIZER_DOMAIN }}"
+            AuthCookieSettings__SameSite=2
         
         - name: Run Azure webapp deploy action for ${{ matrix.project }}
           uses: azure/webapps-deploy@v3
