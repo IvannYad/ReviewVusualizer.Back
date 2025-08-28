@@ -47,7 +47,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                     {
                         Expires = DateTimeOffset.UtcNow.AddHours(1),
                         HttpOnly = false,
-                        Secure = true,
+                        Secure = false,
                         SameSite = SameSiteMode.Strict,
                         IsEssential = true // important if you use cookie consent
                     });
