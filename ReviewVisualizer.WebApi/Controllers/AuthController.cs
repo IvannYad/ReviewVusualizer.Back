@@ -47,7 +47,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                     {
                         Expires = DateTimeOffset.UtcNow.AddHours(1),
                         HttpOnly = false,
-                        Secure = false,
+                        Secure = true,
                         SameSite = SameSiteMode.Strict
                     });
 
