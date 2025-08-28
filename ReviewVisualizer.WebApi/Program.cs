@@ -59,7 +59,7 @@ namespace VisualizerProject
             {
                 opt.AddDefaultPolicy(policy =>
                 {
-                    policy.WithOrigins(corsSettings.AllowedOrigins)
+                    policy.WithOrigins(corsSettings.GetAllowedOriginsArray())
                         .WithHeaders(corsSettings.AllowedHeaders)
                         .WithMethods(corsSettings.AllowedMethods)
                         .SetPreflightMaxAge(TimeSpan.FromSeconds(corsSettings.PreflightMaxAgeInSeconds))
