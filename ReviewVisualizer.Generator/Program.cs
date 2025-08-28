@@ -105,6 +105,7 @@ namespace GeneratorProject
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
+                    options.Cookie.Domain = authCookieSettings!.Domain;
                     options.Cookie.Name = authCookieSettings!.Name;
                     options.Cookie.Path = authCookieSettings!.Path;
                     options.Cookie.SameSite = authCookieSettings!.SameSite;

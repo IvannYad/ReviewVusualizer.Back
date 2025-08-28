@@ -89,6 +89,7 @@ namespace VisualizerProject
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
+                    options.Cookie.Domain = authCookieSettings!.Domain;
                     options.Cookie.Name = authCookieSettings!.Name;
                     options.Cookie.Path = authCookieSettings!.Path;
                     options.Cookie.SameSite = authCookieSettings!.SameSite;
@@ -135,7 +136,7 @@ namespace VisualizerProject
             {
                 MinimumSameSitePolicy = cookiesSettings!.SameSite,
                 HttpOnly = cookiesSettings!.HttpOnly,
-                Secure = cookiesSettings!.Secure,
+                Secure = cookiesSettings!.Secure
             });
             app.UseAuthentication();
             app.UseAuthorization();
