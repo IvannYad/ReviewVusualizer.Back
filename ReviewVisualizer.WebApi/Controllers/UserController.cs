@@ -107,8 +107,6 @@ namespace ReviewVisualizer.WebApi.Controllers
 
             try
             {
-                _dbContext.SaveChanges();
-
                 return Ok(dto);
             }
             catch (Exception ex)
