@@ -9,6 +9,7 @@ using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Dto;
 using ReviewVisualizer.Data.Enums;
 using ReviewVisualizer.Data.Models;
+using System.Linq.Expressions;
 
 namespace ReviewVisualizer.WebApi.Controllers
 {
@@ -87,32 +88,32 @@ namespace ReviewVisualizer.WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == dto.UserId);
+
+            if (user is null)
+                return NotFound();
+
+            var claim = user.Claims.FirstOrDefault(c => c.ClaimType == ClaimTypes.GeneratorModifications.GetClaimType());
+            if (claim is null)
+                user.Claims.Add(new UserClaim
+                {
+                    ClaimType = ClaimTypes.GeneratorModifications.GetClaimType(),
+                    ClaimValue = Convert.ToInt32(dto.Modifications).ToString()
+                });
+            else
+            {
+                claim.ClaimValue = Convert.ToInt32(dto.Modifications).ToString();
+            }
+
             try
             {
-                var user = _dbContext.Users.FirstOrDefault(u => u.Id == dto.UserId);
-
-                if (user is null)
-                    return NotFound();
-
-                var claim = user.Claims.FirstOrDefault(c => c.ClaimType == ClaimTypes.GeneratorModifications.GetClaimType());
-                if (claim is null)
-                    user.Claims.Add(new UserClaim
-                    {
-                        ClaimType = ClaimTypes.GeneratorModifications.GetClaimType(),
-                        ClaimValue = Convert.ToInt32(dto.Modifications).ToString()
-                    });
-                else
-                {
-                    claim.ClaimValue = Convert.ToInt32(dto.Modifications).ToString();
-                }
-
                 _dbContext.SaveChanges();
 
-                return Ok("Success");
+                return Ok(dto);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex);
+                return Ok(ex);
             }
         }
 
