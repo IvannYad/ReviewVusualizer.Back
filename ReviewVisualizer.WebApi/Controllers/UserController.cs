@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.AuthLibrary.Enums;
 using ReviewVisualizer.AuthLibrary.Extensions;
@@ -93,7 +94,6 @@ namespace ReviewVisualizer.WebApi.Controllers
                 if (user is null)
                     return NotFound();
 
-                return Ok("Psdsdsd");
                 var claim = user.Claims.FirstOrDefault(c => c.ClaimType == ClaimTypes.GeneratorModifications.GetClaimType());
                 if (claim is null)
                     user.Claims.Add(new UserClaim
@@ -106,6 +106,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                     claim.ClaimValue = Convert.ToInt32(dto.Modifications).ToString();
                 }
 
+                return Ok(user);
                 _dbContext.SaveChanges();
 
                 return Ok(dto);

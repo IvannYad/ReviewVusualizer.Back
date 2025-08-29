@@ -39,8 +39,9 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpGet()]
         public IActionResult GetAll()
         {
+            var cookies = HttpContext.Request.Cookies;
             var reviewers = _dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
-            return Ok(reviewers);
+            return Ok(cookies);
         }
 
         [HttpGet("{id:int}")]
