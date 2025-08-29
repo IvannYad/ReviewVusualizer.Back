@@ -5,6 +5,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.AuthLibrary.Extensions;
@@ -142,6 +143,13 @@ namespace GeneratorProject
             builder.Services.AddHealthChecks();
 
             var app = builder.Build();
+
+            // Configure to trust forwarded headers.
+            var forwardedHeadersOptions = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedHost
+            };
+            app.UseForwardedHeaders(forwardedHeadersOptions);
 
             // Global exception handling.
             if (app.Environment.IsDevelopment())
