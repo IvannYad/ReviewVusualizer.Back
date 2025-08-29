@@ -81,6 +81,7 @@ namespace ReviewVisualizer.WebApi.Controllers
         [HttpPatch("generator-modifications")]
         public IActionResult UpdateUserGeneratorModifications([FromBody] UpdateGeneratorModificationsDto dto)
         {
+            return Ok();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
