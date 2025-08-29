@@ -106,10 +106,9 @@ namespace ReviewVisualizer.WebApi.Controllers
                     claim.ClaimValue = Convert.ToInt32(dto.Modifications).ToString();
                 }
 
-                return Ok(user);
                 _dbContext.SaveChanges();
 
-                return Ok(dto);
+                return Ok("Success");
             }
             catch (Exception ex)
             {

@@ -40,8 +40,13 @@ namespace ReviewVisualizer.Generator.Controllers
         public IActionResult GetAll()
         {
             var cookies = HttpContext.Request.Cookies;
+            var user = HttpContext.User;
             var reviewers = _dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
-            return Ok(cookies);
+            return Ok(new
+            {
+                User = user,
+                Cookies = cookies,
+            });
         }
 
         [HttpGet("{id:int}")]
