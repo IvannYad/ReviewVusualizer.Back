@@ -14,7 +14,6 @@ namespace ReviewVisualizer.Generator.Controllers
 {
     [ApiController]
     [Route("reviewers")]
-    [Authorize(Policy = Policies.RequireGeneratorAdmin)]
     public class ReviewerController : ControllerBase
     {
         private readonly ILogger<ReviewerController> _logger;

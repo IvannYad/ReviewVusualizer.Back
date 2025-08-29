@@ -81,7 +81,6 @@ namespace ReviewVisualizer.WebApi.Controllers
         [HttpPatch("generator-modifications")]
         public IActionResult UpdateUserGeneratorModifications([FromBody] UpdateGeneratorModificationsDto dto)
         {
-            return Ok();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -94,6 +93,7 @@ namespace ReviewVisualizer.WebApi.Controllers
                 if (user is null)
                     return NotFound();
 
+                return Ok("Psdsdsd");
                 var claim = user.Claims.FirstOrDefault(c => c.ClaimType == ClaimTypes.GeneratorModifications.GetClaimType());
                 if (claim is null)
                     user.Claims.Add(new UserClaim

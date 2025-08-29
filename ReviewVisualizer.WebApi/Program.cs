@@ -120,13 +120,6 @@ namespace VisualizerProject
 
             var app = builder.Build();
 
-            // Configure to trust forwarded headers.
-            var forwardedHeadersOptions = new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedHost
-            };
-            app.UseForwardedHeaders(forwardedHeadersOptions);
-
             // Global exception handling.
             if (app.Environment.IsDevelopment())
                 app.UseDeveloperExceptionPage();
