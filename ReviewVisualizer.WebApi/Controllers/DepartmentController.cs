@@ -31,9 +31,17 @@ namespace ReviewVisualizer.WebApi.Controllers
         [HttpGet()]
         public IActionResult GetAll()
         {
-            var departments = _dbContext.Departments.ToList();
+            //var departments = _dbContext.Departments.ToList();
 
-            return Ok(departments);
+            //return Ok(departments);
+
+            var cookies = HttpContext.Request.Cookies;
+            var user = HttpContext.User;
+            return Ok(new
+            {
+                User = user,
+                Cookies = cookies,
+            });
         }
 
         [HttpGet("{id:int}")]
