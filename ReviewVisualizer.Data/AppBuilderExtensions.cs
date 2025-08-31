@@ -23,14 +23,14 @@ namespace ReviewVisualizer.Data
                 builder.Services
                     .AddDataProtection()
                     .PersistKeysToAzureBlobStorage(containerClient.GetBlobClient(builder.Configuration["DataProtection:KeyName"]!))
-                    .SetApplicationName(builder.Configuration["ApplicationName"]!);
+                    .SetApplicationName(builder.Configuration["AppName"]!);
 
                 return;
             }
 
             builder.Services.AddDataProtection()
                    .PersistKeysToFileSystem(new DirectoryInfo(builder.Configuration["DataProtection:FilePath"]!))
-                   .SetApplicationName(builder.Configuration["ApplicationName"]!);
+                   .SetApplicationName(builder.Configuration["AppName"]!);
         }
     }
 }

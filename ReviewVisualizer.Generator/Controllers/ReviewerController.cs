@@ -66,7 +66,7 @@ namespace ReviewVisualizer.Generator.Controllers
                         CookieDomain = _configuration["AuthCookieSettings:Domain"],
                         DataProtectionUrl = _configuration["DataProtection:Url"],
                         DataProtectionContainer = _configuration["DataProtection:ContainerName"],
-                        ApplicationName = _configuration["ApplicationName"]
+                        AppName = _configuration["AppName"]
                     }
                 });
             }
