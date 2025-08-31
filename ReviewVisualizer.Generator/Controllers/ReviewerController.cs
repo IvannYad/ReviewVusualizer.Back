@@ -124,15 +124,22 @@ namespace ReviewVisualizer.Generator.Controllers
         [HttpPost("generate-review")]
         public async Task<IActionResult> Generate([FromBody] GenerateReviewRequest request)
         {
-            if (!(await IsUserAuthorizedForModificationAsync(request.Type).ConfigureAwait(false)))
-                return Forbid();
+            try
+            {
+                if (!(await IsUserAuthorizedForModificationAsync(request.Type).ConfigureAwait(false)))
+                    return Forbid();
 
-            var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == request.ReviewerId);
-            if (reviewer is null) return NotFound();
+                var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == request.ReviewerId);
+                if (reviewer is null) return NotFound();
 
-            _generatorHost.GenerateReview(request);
+                _generatorHost.GenerateReview(request);
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         [HttpPost("add-teachers")]
