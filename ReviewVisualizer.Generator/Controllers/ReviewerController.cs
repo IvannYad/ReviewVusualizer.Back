@@ -129,6 +129,7 @@ namespace ReviewVisualizer.Generator.Controllers
                 if (!(await IsUserAuthorizedForModificationAsync(request.Type).ConfigureAwait(false)))
                     return Forbid();
 
+                return Ok("Papapapa");
                 var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == request.ReviewerId);
                 if (reviewer is null) return NotFound();
 
