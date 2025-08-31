@@ -20,54 +20,20 @@ namespace ReviewVisualizer.WebApi.Controllers
         private readonly ApplicationDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly ImageService _imageService;
-        private readonly IServiceProvider _services;
-        private readonly IConfiguration _configuration;
 
-        public DepartmentController(IConfiguration configuration, ApplicationDbContext dbContext, IMapper mapper
-            , ImageService imageService, IServiceProvider services)
+        public DepartmentController(ApplicationDbContext dbContext, IMapper mapper
+            , ImageService imageService)
         {
             _imageService = imageService;
             _dbContext = ApplicationDbContext.CreateNew(dbContext);
             _mapper = mapper;
-            _configuration = configuration;
-            _services = services;
         }
 
         [HttpGet()]
         public IActionResult GetAll()
         {
-            //var departments = _dbContext.Departments.ToList();
-
-            //return Ok(departments);
-
-            try
-            {
-                var dataProtection = _services.GetRequiredService<IDataProtectionProvider>();
-                var protector = dataProtection.CreateProtector("test");
-                var encrypted = protector.Protect("test");
-                var decrypted = protector.Unprotect(encrypted);
-
-                var cookies = HttpContext.Request.Cookies;
-                var user = HttpContext.User;
-                return Ok(new
-                {
-                    Encrypted = encrypted,
-                    Decrypted = decrypted,
-                    User = user,
-                    Cookies = cookies,
-                    Configuration = new
-                    {
-                        CookieDomain = _configuration["AuthCookieSettings:Domain"],
-                        DataProtectionUrl = _configuration["DataProtection:Url"],
-                        DataProtectionContainer = _configuration["DataProtection:ContainerName"],
-                        AppName = _configuration["AppName"]
-                    }
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
+            var departments = _dbContext.Departments.ToList();
+            return Ok(departments);
         }
 
         [HttpGet("{id:int}")]
