@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.AuthLibrary;
@@ -22,8 +23,11 @@ namespace ReviewVisualizer.Generator.Controllers
         private readonly IGeneratorHost _generatorHost;
         private readonly ILifetimeScope _container;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IServiceProvider _services;
+        private readonly IConfiguration _configuration;
 
-        public ReviewerController(ILifetimeScope container, IAuthorizationService authorizationService)
+        public ReviewerController(ILifetimeScope container, IAuthorizationService authorizationService, IServiceProvider services
+            , IConfiguration configuration)
         {
             _container = container;
 
@@ -34,19 +38,43 @@ namespace ReviewVisualizer.Generator.Controllers
             _mapper = scope.Resolve<IMapper>();
             _generatorHost = scope.Resolve<IGeneratorHost>();
             _authorizationService = authorizationService;
+            _services = services;
+            _configuration = configuration;
         }
 
         [HttpGet()]
         public IActionResult GetAll()
         {
-            var cookies = HttpContext.Request.Cookies;
-            var user = HttpContext.User;
-            var reviewers = _dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
-            return Ok(new
+            try
             {
-                User = user,
-                Cookies = cookies,
-            });
+                var dataProtection = _services.GetRequiredService<IDataProtectionProvider>();
+                var protector = dataProtection.CreateProtector("test");
+                var encrypted = protector.Protect("test");
+                var decrypted = protector.Unprotect(encrypted);
+
+                var cookies = HttpContext.Request.Cookies;
+                var user = HttpContext.User;
+                var reviewers = _dbContext.Reviewers.AsNoTracking().Include(r => r.Teachers).ToList();
+                return Ok(new
+                {
+                    Encrypted = encrypted,
+                    Decrypted = decrypted,
+                    User = user,
+                    Cookies = cookies,
+                    Configuration = new
+                    {
+                        CookieDomain = _configuration["AuthCookieSettings:Domain"],
+                        DataProtectionUrl = _configuration["DataProtection:Url"],
+                        DataProtectionContainer = _configuration["DataProtection:ContainerName"],
+                        ApplicationName = _configuration["ApplicationName"]
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+
         }
 
         [HttpGet("{id:int}")]
