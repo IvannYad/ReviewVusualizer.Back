@@ -45,6 +45,11 @@ namespace GeneratorProject
                 .ReadFrom.Configuration(builder.Configuration) // Read config from appsettings.json
                 .CreateLogger();
             builder.Host.UseSerilog();
+            
+            // Log startup information
+            Log.Information("Starting Generator service...");
+            Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
+            Log.Information("Application Name: {AppName}", builder.Configuration["AppName"]);
 
             // Add Autofac.
             builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
@@ -102,6 +107,11 @@ namespace GeneratorProject
             });
 
             builder.AddDataProtection();
+            
+            // Log Data Protection configuration
+            Log.Information("Data Protection configured with AppName: {AppName}", builder.Configuration["AppName"]);
+            Log.Information("Data Protection URL: {Url}", builder.Configuration["DataProtection:Url"]);
+            Log.Information("Data Protection Container: {Container}", builder.Configuration["DataProtection:ContainerName"]);
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -114,15 +124,21 @@ namespace GeneratorProject
                     options.Cookie.HttpOnly = authCookieSettings!.HttpOnly.HasFlag(HttpOnlyPolicy.Always);
                     options.Events.OnRedirectToLogin = context =>
                     {
+                        Log.Warning("Authentication failed - redirecting to login for request: {Path}", context.Request.Path);
                         context.Response.StatusCode = 401;
                         return Task.CompletedTask;
                     };
                     options.Events.OnRedirectToAccessDenied = context =>
                     {
+                        Log.Warning("Access denied - redirecting for request: {Path}", context.Request.Path);
                         context.Response.StatusCode = 403;
                         return Task.CompletedTask;
                     };
                 });
+            
+            // Log authentication configuration
+            Log.Information("Authentication configured with Cookie Domain: {Domain}", authCookieSettings!.Domain);
+            Log.Information("Authentication configured with Cookie Name: {Name}", authCookieSettings!.Name);
             builder.Services.AddAuthorizationPolicies()
                 .AddAuthorizationHandlers();
 
@@ -143,12 +159,20 @@ namespace GeneratorProject
             builder.Services.AddHealthChecks();
 
             var app = builder.Build();
+            
+            Log.Information("Application built successfully");
 
             // Global exception handling.
             if (app.Environment.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
+                Log.Information("Development exception page enabled");
+            }
             else
+            {
                 app.UseExceptionHandler();
+                Log.Information("Production exception handler enabled");
+            }
 
             app.UseStatusCodePages();
 
@@ -162,7 +186,10 @@ namespace GeneratorProject
                 Secure = cookiesSettings!.Secure,
             });
             app.UseAuthentication();
+            Log.Information("Authentication middleware added");
+            
             app.UseAuthorization();
+            Log.Information("Authorization middleware added");
 
             app.MapHealthChecks("/health");
             app.MapControllers();
@@ -177,6 +204,10 @@ namespace GeneratorProject
             app.UseSwagger();
             app.UseSwaggerUI();
 
+            Log.Information("Generator service starting up...");
+            Log.Information("Swagger UI available at /swagger");
+            Log.Information("Health check available at /health");
+            
             app.Run();
         }
     }
