@@ -48,7 +48,7 @@ namespace ReviewVisualizer.Generator.Controllers
         public IActionResult Get(int id)
         {
             _logger.LogInformation("Get endpoint called for reviewer ID: {Id}", id);
-            
+
             var reviewer = _dbContext.Reviewers
                 .AsNoTracking()
                 .Include(r => r.Teachers)
@@ -68,7 +68,7 @@ namespace ReviewVisualizer.Generator.Controllers
         public IActionResult GetByGeneratorType([FromRoute] GeneratorType type)
         {
             _logger.LogInformation("GetByGeneratorType endpoint called for type: {Type}", type);
-            
+
             var reviewers = _dbContext.Reviewers
                 .AsNoTracking()
                 .Include(r => r.Teachers)
@@ -88,7 +88,7 @@ namespace ReviewVisualizer.Generator.Controllers
         public async Task<IActionResult> CreateAsync([FromBody] ReviewerCreateDTO reviewerDTO)
         {
             _logger.LogInformation("CreateAsync endpoint called for reviewer type: {Type}", reviewerDTO.Type);
-            
+
             //if (!Debugger.IsAttached)
             //{
             //    Debugger.Launch();  // Will prompt to select a debugger (Visual Studio, etc.)
@@ -129,7 +129,7 @@ namespace ReviewVisualizer.Generator.Controllers
         public async Task<IActionResult> DeleteAsync([FromQuery] int reviewerId)
         {
             _logger.LogInformation("DeleteAsync endpoint called for reviewer ID: {Id}", reviewerId);
-            
+
             //Debugger.Break();
             var reviewer = await _dbContext.Reviewers.FirstOrDefaultAsync(r => r.Id == reviewerId).ConfigureAwait(false);
             if (reviewer is null)
@@ -161,7 +161,7 @@ namespace ReviewVisualizer.Generator.Controllers
         public async Task<IActionResult> Generate([FromBody] GenerateReviewRequest request)
         {
             _logger.LogInformation("Generate endpoint called for reviewer ID: {ReviewerId}, type: {Type}", request.ReviewerId, request.Type);
-            
+
             try
             {
                 if (!(await IsUserAuthorizedForModificationAsync(request.Type).ConfigureAwait(false)))
@@ -195,7 +195,7 @@ namespace ReviewVisualizer.Generator.Controllers
         public async Task<IActionResult> AddTeachersAsync([FromQuery] int reviewerId, [FromBody] int[] teacherIds)
         {
             _logger.LogInformation("AddTeachersAsync endpoint called for reviewer ID: {ReviewerId} with {TeacherCount} teacher IDs", reviewerId, teacherIds.Length);
-            
+
             var reviewer = _dbContext.Reviewers.Include(r => r.Teachers).FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null)
             {
@@ -225,7 +225,7 @@ namespace ReviewVisualizer.Generator.Controllers
         public async Task<IActionResult> RemoveTeachers([FromQuery] int reviewerId, [FromBody] int[] teacherIds)
         {
             _logger.LogInformation("RemoveTeachers endpoint called for reviewer ID: {ReviewerId} with {TeacherCount} teacher IDs", reviewerId, teacherIds.Length);
-            
+
             var reviewer = _dbContext.Reviewers.Include(r => r.Teachers).FirstOrDefault(r => r.Id == reviewerId);
             if (reviewer is null)
             {
@@ -251,9 +251,9 @@ namespace ReviewVisualizer.Generator.Controllers
 
         private async Task<bool> IsUserAuthorizedForModificationAsync(GeneratorType type)
         {
-            _logger.LogInformation("Checking authorization for user {User} on GeneratorType {Type}", 
+            _logger.LogInformation("Checking authorization for user {User} on GeneratorType {Type}",
                 User.Identity?.Name ?? "Anonymous", type);
-            
+
             string? policyName = type switch
             {
                 GeneratorType.FIRE_AND_FORGET => Policies.ModifyFireAndForget,
@@ -273,7 +273,7 @@ namespace ReviewVisualizer.Generator.Controllers
             // Inject IAuthorizationService into controller via DI
             var authResult = await _authorizationService.AuthorizeAsync(User, policyName!).ConfigureAwait(false);
 
-            _logger.LogInformation("Authorization result for user {User} on policy {Policy}: {Result}", 
+            _logger.LogInformation("Authorization result for user {User} on policy {Policy}: {Result}",
                 User.Identity?.Name ?? "Anonymous", policyName, authResult.Succeeded ? "SUCCESS" : "FAILED");
 
             return authResult.Succeeded;

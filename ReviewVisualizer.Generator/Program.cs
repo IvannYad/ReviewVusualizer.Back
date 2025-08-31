@@ -45,7 +45,7 @@ namespace GeneratorProject
                 .ReadFrom.Configuration(builder.Configuration) // Read config from appsettings.json
                 .CreateLogger();
             builder.Host.UseSerilog();
-            
+
             // Log startup information
             Log.Information("Starting Generator service...");
             Log.Information("Environment: {Environment}", builder.Environment.EnvironmentName);
@@ -107,7 +107,7 @@ namespace GeneratorProject
             });
 
             builder.AddDataProtection();
-            
+
             // Log Data Protection configuration
             Log.Information("Data Protection configured with AppName: {AppName}", builder.Configuration["AppName"]);
             Log.Information("Data Protection URL: {Url}", builder.Configuration["DataProtection:Url"]);
@@ -135,7 +135,7 @@ namespace GeneratorProject
                         return Task.CompletedTask;
                     };
                 });
-            
+
             // Log authentication configuration
             Log.Information("Authentication configured with Cookie Domain: {Domain}", authCookieSettings!.Domain);
             Log.Information("Authentication configured with Cookie Name: {Name}", authCookieSettings!.Name);
@@ -159,7 +159,7 @@ namespace GeneratorProject
             builder.Services.AddHealthChecks();
 
             var app = builder.Build();
-            
+
             Log.Information("Application built successfully");
 
             // Global exception handling.
@@ -187,7 +187,7 @@ namespace GeneratorProject
             });
             app.UseAuthentication();
             Log.Information("Authentication middleware added");
-            
+
             app.UseAuthorization();
             Log.Information("Authorization middleware added");
 
@@ -207,7 +207,7 @@ namespace GeneratorProject
             Log.Information("Generator service starting up...");
             Log.Information("Swagger UI available at /swagger");
             Log.Information("Health check available at /health");
-            
+
             app.Run();
         }
     }
