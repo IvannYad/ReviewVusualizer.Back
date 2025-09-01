@@ -4,8 +4,6 @@ using AutoMapper;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using ReviewVisualizer.AuthLibrary;
 using ReviewVisualizer.AuthLibrary.Extensions;
@@ -45,6 +43,7 @@ namespace GeneratorProject
                 .ReadFrom.Configuration(builder.Configuration) // Read config from appsettings.json
                 .CreateLogger();
             builder.Host.UseSerilog();
+            builder.Logging.AddAzureWebAppDiagnostics();
 
             // Log startup information
             Log.Information("Starting Generator service...");
