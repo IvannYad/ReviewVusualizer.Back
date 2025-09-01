@@ -164,7 +164,7 @@ namespace ReviewVisualizer.Generator.Controllers
 
             try
             {
-                if (!(await IsUserAuthorizedForModificationAsync(request.Type).ConfigureAwait(false)))
+                if (!await IsUserAuthorizedForModificationAsync(request.Type).ConfigureAwait(false))
                 {
                     _logger.LogWarning("User not authorized to generate review for type: {Type}", request.Type);
                     return Forbid();
