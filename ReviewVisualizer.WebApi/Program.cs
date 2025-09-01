@@ -9,6 +9,7 @@ using ReviewVisualizer.AuthLibrary.Extensions;
 using ReviewVisualizer.Data;
 using ReviewVisualizer.Data.Mapper;
 using ReviewVisualizer.WebApi;
+using ReviewVisualizer.WebApi.RatingCalculationEngine;
 using ReviewVisualizer.WebApi.Services;
 using Serilog;
 using Serilog.Events;
@@ -118,6 +119,8 @@ namespace VisualizerProject
 
             builder.Services.AddHealthChecks();
 
+            builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>();
+
             var app = builder.Build();
 
             // Global exception handling.
@@ -147,7 +150,7 @@ namespace VisualizerProject
 
             app.MapControllers();
 
-            app.StartProcessorHost();
+            //app.StartProcessorHost();
             app.StartRatingCalculationEngine();
 
             app.AddAdminUser();
