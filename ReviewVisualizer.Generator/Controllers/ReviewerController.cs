@@ -171,7 +171,7 @@ namespace ReviewVisualizer.Generator.Controllers
                 }
 
                 _logger.LogInformation("Generating review for reviewer ID: {ReviewerId}", request.ReviewerId);
-                return Ok("Papapapa");
+
                 var reviewer = _dbContext.Reviewers.FirstOrDefault(r => r.Id == request.ReviewerId);
                 if (reviewer is null)
                 {
