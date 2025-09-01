@@ -100,7 +100,7 @@ namespace ReviewVisualizer.Generator.Generator
             _logger.LogInformation($"\"Recurring\" review generation job is scheduled with cron expression {cron}");
         }
 
-        protected void GenerateReview(int reviewerId)
+        public void GenerateReview(int reviewerId)
         {
             lock (_locker)
             {
