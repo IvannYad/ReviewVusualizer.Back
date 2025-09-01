@@ -2139,6 +2139,7 @@
           "Azure.Storage.Blobs": "[12.25.0, )",
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": "[8.0.10, )",
           "Microsoft.EntityFrameworkCore.Proxies": "[8.0.10, )",
+          "Microsoft.Extensions.Logging.AzureAppServices": "[9.0.8, )",
           "ReviewVisualizer.AuthLibrary": "[1.0.0, )",
           "ReviewVisualizer.Data": "[1.0.0, )",
           "Serilog": "[4.0.2, )",

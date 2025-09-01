@@ -114,7 +114,7 @@ namespace ReviewVisualizer.WebApi.RatingCalculationEngine
                             var previousRating = teacher.Rating;
 
                             double? avgRating = reviews.Count > 0 ? reviews.Average(r => r.Overall) : null;
-                            var newRating = avgRating is not null ? (double)Math.Round((decimal)avgRating, 2) : null;
+                            double? newRating = avgRating is not null ? (double)Math.Round((decimal)avgRating, 2) : null;
 
                             if (teacher.Rating != newRating)
                             {
@@ -197,7 +197,7 @@ namespace ReviewVisualizer.WebApi.RatingCalculationEngine
                                     HAVING d.Id = {department.Id}
                                 ").First();
 
-                            var newRating = avgRating is not null ? (double)Math.Round((decimal)avgRating, 2) : null;
+                            double? newRating = avgRating is not null ? (double)Math.Round((decimal)avgRating, 2) : null;
 
                             if (department.Rating != newRating)
                             {

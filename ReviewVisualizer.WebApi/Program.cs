@@ -43,6 +43,7 @@ namespace VisualizerProject
                 .CreateLogger();
 
             builder.Host.UseSerilog();
+            builder.Logging.AddAzureWebAppDiagnostics();
 
             builder.Services.AddControllers(options =>
             {
@@ -119,7 +120,7 @@ namespace VisualizerProject
 
             builder.Services.AddHealthChecks();
 
-            builder.Services.AddSingleton<IRatingCalculatingEngine, RatingCalculatingEngine>();
+            builder.Services.AddScoped<IRatingCalculatingEngine, RatingCalculatingEngine>();
 
             var app = builder.Build();
 
